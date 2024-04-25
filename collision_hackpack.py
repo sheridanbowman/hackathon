@@ -1,11 +1,21 @@
 import pygame
+from staticTile import staticTile
+from tileChunks import tileChunk, createProceduralChunk, createCustomChunk
 from pygame.locals import *
 
 WIDTH = 800
-HEIGHT = 600
+HEIGHT = 1000
+TILE_SIZE = 20
 
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
 pygame.display.set_caption('My Game')
+
+# Demo of start level
+testChunk = createCustomChunk()
+
+# Demo of procedural level at depth X>0 
+# depth = 1
+# testChunk = createProceduralChunk(depth) 
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -113,8 +123,14 @@ while running == True:
     all_sprite_list.update(pressed_keys)
     #player.update(pressed_keys)
 
-    screen.fill((255,255,255))
+    # screen.fill((255,255,255))
     all_sprite_list.draw(screen)
+
+    # Testing chunk
+    for tileInstance in testChunk.getTiles():
+        color = tileInstance.debugColor
+        if color:
+            pygame.draw.rect(screen, color, (tileInstance.coords[0], tileInstance.coords[1], TILE_SIZE, TILE_SIZE))
 
     pygame.display.flip()
     clock.tick(60)
