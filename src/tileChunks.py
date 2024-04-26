@@ -40,11 +40,13 @@ def setChunkDims(displayWidth:int, displayHeight:int, tileSize:int):
     tilesPerChunkWidth = math.ceil(displayWidth / tileSize)
     tilesPerChunkHeight = math.ceil(displayHeight / tileSize)
     tilesSize = tileSize
+    return tilesPerChunkHeight, tilesPerChunkWidth
 
 # Initializes a random tileChunk
 # Produces X% of each tile type, determined by Depth, and shuffles into 2D array for chunk
 # addCavernsLater: Flag to skip 'adding caverns', if it's expected to be handled in Custom array after more adds 
 def createProceduralChunk(depth:int=0, addCavernsLater=False):
+    print("Creating chunk @ depth", depth)
     totalTiles = tilesPerChunkWidth * tilesPerChunkHeight
     newChunk = tileChunk(depth, CAVE_BG)
     unsortedTiles = []
@@ -169,13 +171,13 @@ def createCustomChunk(depth:int=0, customArray=False):
             for localTile in chunk.tilesArray[index]:
                 if localTile.treasure or localTile.enemySpawn=="Default":
                     soonCavern = True
-                    print("found cavern", index)
+                    # print("found cavern", index)
                     break
             if soonCavern:
                 break
 
         if not soonCavern:
-            print("no cavern found, adding cavern", startSpace+3, tilesPerChunkWidth//2)
+            # print("no cavern found, adding cavern", startSpace+3, tilesPerChunkWidth//2)
             lastTile = chunk.tilesArray[startSpace+3][tilesPerChunkWidth//2]
             chunk.tilesArray[startSpace+3][tilesPerChunkWidth//2] = staticTile(treasure=True, coords=lastTile.coords)
 
@@ -203,7 +205,6 @@ class tileChunk:
             for row in self.tilesArray:
                 for item in row:
                     flattenedList.append(item)
-            # print(len(flattenedList))
             return flattenedList
         else:
             return self.tilesArray
