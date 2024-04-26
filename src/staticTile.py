@@ -2,7 +2,7 @@ class staticTile:
     def __init__(self, enemySpawn=False, 
                  default: bool = False, treasure: bool = False, 
                  gem: bool = False, empty:bool = False, grass:bool = False, 
-                 coords:tuple[int, int] = (0,0)):
+                 boundary:bool=False, coords:tuple[int, int] = (0,0)):
         self.enemySpawn = enemySpawn
         self.default = default
         self.treasure = treasure
@@ -10,8 +10,9 @@ class staticTile:
         self.empty = empty
         self.grass = grass
         self.coords = coords
+        self.boundary = boundary
     
-        self.debugColor = (0,0,0)
+        self.debugColor = None
 
         if enemySpawn == "Ghost":
             self.debugColor = (192, 192, 192)
@@ -26,7 +27,10 @@ class staticTile:
         if empty:
             self.debugColor = False
         if grass:
-            self.debugColor =  (0, 255, 0)
+            self.debugColor = (0, 255, 0)
+        if boundary:
+            self.debugColor = (0, 0, 0)
+        
         
             
         
