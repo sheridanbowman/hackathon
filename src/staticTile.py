@@ -1,8 +1,12 @@
+import pygame
+from pygame.locals import *
+
 class staticTile:
     def __init__(self, enemySpawn=False, 
                  default: bool = False, treasure: bool = False, 
                  gem: bool = False, empty:bool = False, grass:bool = False, 
                  boundary:bool=False, coords:tuple[int, int] = (0,0)):
+        super().__init__()
         self.enemySpawn = enemySpawn
         self.default = default
         self.treasure = treasure

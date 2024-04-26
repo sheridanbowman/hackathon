@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 
+
 class Tank(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super(Tank, self).__init__()
@@ -22,6 +23,7 @@ class Tank(pygame.sprite.Sprite):
         self.change_y = y_diff
     
     def update(self, pressed_keys):
+        # Player position
         not_moving = True
         if pressed_keys[K_w]:
             self.change_speed(0, -3)
@@ -40,6 +42,7 @@ class Tank(pygame.sprite.Sprite):
 
         self.rect.x += self.change_x
         collide_list = pygame.sprite.spritecollide(self, self.walls, False)
+
 
         # collide list is a list of all of the sprites that the player is 
         # currently in contact with. If they are currently touching something,
@@ -60,4 +63,3 @@ class Tank(pygame.sprite.Sprite):
                 self.rect.bottom = wall.rect.top
             else:
                 self.rect.top = wall.rect.bottom
-
