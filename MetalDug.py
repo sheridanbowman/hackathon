@@ -111,12 +111,13 @@ all_sprite_list.add(player)
 
 # Demo camera init, offsets all items Y values based on player pos 
 camera_x, camera_y = 0, 0
+camLowerBound = HEIGHT // 2
+globalOffset = 0
 #todo, doesnt actually keep player in center of screen .... 
 
 wall1 = Wall(100, 0, 10, 200)
 wall_list.add(wall1)
 all_sprite_list.add(wall1)
-
 player.walls = wall_list
 
 running = True
@@ -135,19 +136,21 @@ while running == True:
     player.update(pressed_keys)
 
     # Update camera offset to follow the player
-    camera_x = player.rect.x - WIDTH // 2
-    camera_y = max(0, player.rect.y - HEIGHT // 2)
+    camera_y = max(0, (player.rect.y ) - ((camLowerBound) + globalOffset))
 
-    player.rect.y -= camera_y
-    
+    if camera_y > 0:
+        offset = player.rect.y - camLowerBound
+        player.rect.y = camLowerBound
+        globalOffset -= offset
+
     # Testing BG 
-    screen.blit(stretched_image, (0-camera_x, 0-camera_y))
+    screen.blit(stretched_image, (0, 0-camera_y))
 
     # Testing chunk
     for tileInstance in testChunk.getTiles():
         color = tileInstance.debugColor
         if color:
-            pygame.draw.rect(screen, color, (tileInstance.coords[0]-camera_x, tileInstance.coords[1], TILE_PX_SIZE, TILE_PX_SIZE))
+            pygame.draw.rect(screen, color, (tileInstance.coords[0], tileInstance.coords[1]-camera_y, TILE_PX_SIZE, TILE_PX_SIZE))
 
     
     all_sprite_list.draw(screen)
