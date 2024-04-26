@@ -1,6 +1,7 @@
 import pygame
 from src.staticTile import staticTile
 from src.tileChunks import setChunkDims, createProceduralChunk, createCustomChunk
+from src.tank import Tank
 from pygame.locals import *
 
 # Constants for display. Make sure dims are divisible by tile px size!
@@ -8,82 +9,22 @@ WIDTH = 800
 HEIGHT = 1000
 TILE_PX_SIZE = 32
 
-# Pass global info into tileChunks, to determine chunk size
-setChunkDims(WIDTH, HEIGHT, TILE_PX_SIZE)
+# Pass global info into tileChunks, set internal global vars in tilechunks.py
+CHUNK_HEIGHT, CHUNK_WIDTH = setChunkDims(WIDTH, HEIGHT, TILE_PX_SIZE)
 
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
 pygame.display.set_caption('My Game')
 
 # Demo of start level
-testChunk = createCustomChunk()
+chunkList = []
+chunkList.append(createCustomChunk())
 
 # Demo of procedural level at depth X>0 
 # depth = 1
 # testChunk = createProceduralChunk(depth) 
 
-chunkBG = pygame.image.load(testChunk.backgroundImage)
+chunkBG = pygame.image.load(chunkList[0].backgroundImage)
 stretched_image = pygame.transform.scale(chunkBG, (WIDTH, 300))
-
-class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y):
-        super(Player, self).__init__()
-
-        self.image = pygame.image.load('assets/player.png')
-        self.rect = self.image.get_rect()
-
-        # Allows for initialization of the player onto a selected location
-        self.rect.x = x
-        self.rect.y = y
-
-        self.change_x = 0
-        self.change_y = 0
-
-        self.walls = None
-
-    def change_speed(self, x_diff, y_diff):
-        self.change_x = x_diff
-        self.change_y = y_diff
-    
-    def update(self, pressed_keys):
-        not_moving = True
-        if pressed_keys[K_w]:
-            self.change_speed(0, -3)
-            not_moving = False
-        if pressed_keys[K_a]:
-            self.change_speed(-3, 0)
-            not_moving = False
-        if pressed_keys[K_s]:
-            self.change_speed(0, 3)
-            not_moving = False
-        if pressed_keys[K_d]:
-            self.change_speed(3, 0)
-            not_moving = False
-        if not_moving:
-            self.change_speed(0,0)
-
-        self.rect.x += self.change_x
-        collide_list = pygame.sprite.spritecollide(self, self.walls, False)
-
-        # collide list is a list of all of the sprites that the player is 
-        # currently in contact with. If they are currently touching something,
-        # the following code will check if the player is moving left or right
-        # and make sure that the player doesn't move into the other sprite by setting
-        # the player's position to the side of the other sprite
-        for wall in collide_list:
-            if self.change_x > 0:
-                self.rect.right = wall.rect.left
-            else:
-                self.rect.left = wall.rect.right
-
-        # does the same as above, but with up and down
-        self.rect.y += self.change_y
-        collide_list = pygame.sprite.spritecollide(self, self.walls, False)
-        for wall in collide_list:
-            if self.change_y > 0:
-                self.rect.bottom = wall.rect.top
-            else:
-                self.rect.top = wall.rect.bottom
-
 
 class Wall(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
@@ -106,23 +47,31 @@ wall_list = pygame.sprite.Group()
 # It also allows you to call the update() function for all the sprites
 # at once
 
-player = Player(50, 50)
-all_sprite_list.add(player)
+playerTank = Tank(50, 50)
+all_sprite_list.add(playerTank)
 
-# Demo camera init, offsets all items Y values based on player pos 
+# Demo camera init, offsets all items Y values based on playerTank pos 
 camera_x, camera_y = 0, 0
 camLowerBound = HEIGHT // 2
 globalOffset = 0
-#todo, doesnt actually keep player in center of screen .... 
 
 wall1 = Wall(100, 0, 10, 200)
 wall_list.add(wall1)
 all_sprite_list.add(wall1)
-player.walls = wall_list
+playerTank.walls = wall_list
 
 running = True
 while running == True:
     screen.fill((255, 255, 255))
+
+    # Check if deep enough to load new chunk
+    # Compares against # of prev chunks loaded, 33% of latest
+    depth = len(chunkList)
+    if playerTank.rect.y - globalOffset > ((depth-1) + 0.33)*CHUNK_HEIGHT*TILE_PX_SIZE:
+        chunkList.append(createProceduralChunk(depth=depth))
+        # print(len(chunkList), depth)
+        
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -133,26 +82,25 @@ while running == True:
     pressed_keys = pygame.key.get_pressed()
 
     all_sprite_list.update(pressed_keys)
-    player.update(pressed_keys)
+    playerTank.update(pressed_keys)
 
-    # Update camera offset to follow the player
-    camera_y = max(0, (player.rect.y ) - ((camLowerBound) + globalOffset))
-
+    # Update camera offset to follow the playerTank
+    camera_y = max(0, (playerTank.rect.y ) - ((camLowerBound) + globalOffset))
     if camera_y > 0:
-        offset = player.rect.y - camLowerBound
-        player.rect.y = camLowerBound
+        offset = playerTank.rect.y - camLowerBound
+        playerTank.rect.y = camLowerBound
         globalOffset -= offset
 
     # Testing BG 
     screen.blit(stretched_image, (0, 0-camera_y))
 
     # Testing chunk
-    for tileInstance in testChunk.getTiles():
-        color = tileInstance.debugColor
-        if color:
-            pygame.draw.rect(screen, color, (tileInstance.coords[0], tileInstance.coords[1]-camera_y, TILE_PX_SIZE, TILE_PX_SIZE))
+    for chunk in chunkList:
+        for tileInstance in chunk.getTiles():
+            color = tileInstance.debugColor
+            if color:
+                pygame.draw.rect(screen, color, (tileInstance.coords[0], tileInstance.coords[1]-camera_y, TILE_PX_SIZE, TILE_PX_SIZE))
 
-    
     all_sprite_list.draw(screen)
 
     pygame.display.flip()

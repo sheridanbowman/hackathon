@@ -40,11 +40,13 @@ def setChunkDims(displayWidth:int, displayHeight:int, tileSize:int):
     tilesPerChunkWidth = math.ceil(displayWidth / tileSize)
     tilesPerChunkHeight = math.ceil(displayHeight / tileSize)
     tilesSize = tileSize
+    return tilesPerChunkHeight, tilesPerChunkWidth
 
 # Initializes a random tileChunk
 # Produces X% of each tile type, determined by Depth, and shuffles into 2D array for chunk
 # addCavernsLater: Flag to skip 'adding caverns', if it's expected to be handled in Custom array after more adds 
 def createProceduralChunk(depth:int=0, addCavernsLater=False):
+    print("Creating chunk @ depth", depth)
     totalTiles = tilesPerChunkWidth * tilesPerChunkHeight
     newChunk = tileChunk(depth, CAVE_BG)
     unsortedTiles = []
