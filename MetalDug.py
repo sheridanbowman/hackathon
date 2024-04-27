@@ -3,6 +3,7 @@ import math
 from src.background import BackgroundImage, initBackgroundTileGroup
 from src.staticTile import staticTile
 from src.tileChunks import setChunkDims, createProceduralChunk, createCustomChunk
+from src.score import ScoreCounter
 from src.tank import Tank
 from pygame.locals import *
 
@@ -17,6 +18,10 @@ CHUNK_HEIGHT, CHUNK_WIDTH = setChunkDims(WIDTH, HEIGHT, TILE_PX_SIZE)
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
 pygame.display.set_caption('My Game')
 
+
+score = ScoreCounter(0,0,0)
+pygame.font.init()
+font = pygame.font.Font("assets/m5x7/m5x7.ttf", 36)
 # Demo of start level
 firstChunk = createCustomChunk()
 chunkList = []
@@ -28,39 +33,6 @@ chunkList.append(firstChunk)
 
 # chunkBG = pygame.image.load("assets/FREE_Fantasy Forest/Sky.png")
 # stretched_image = pygame.transform.scale(chunkBG, (300, 300))
-
-
-class Collisions:
-    @staticmethod
-    def check_collision(sprite,group):
-        #checks collision between sprites
-        collisions = pygame.sprite.spritecollide(sprite,group, False)
-        return collisions
-    @staticmethod
-    def check_wall_collision(sprite, wall_group):
-        #checks collision between sprite and walls.
-        collisions = pygame.sprite.spritecollide(sprite, wall_group, False)
-        for wall in collisions:
-            if pygame.sprite.collide_rect(sprite, wall):
-                if sprite.rect.bottom > wall.rect.top and sprite.rect.top < wall.rect.bottom:
-                    if sprite.rect.right > wall.rect.left and sprite.rect.left < wall.rect.right:
-                        # Collision will be handled.
-                        sprite.handle_collision(wall)
-
-    @staticmethod
-    def check_projectile_collision(projectile, target_group):
-        #checks collision between projectiles and targets
-        collisions = pygame.sprite.spritecollide(projectile, target_group, False)
-        for target in collisions:
-            if pygame.sprite.collide_rect(projectile, target):
-                # Collision are handled
-                projectile.handle_collision(target)
-
-class Projectile(pygame.sprite.Sprite):
-    def handle_collision(self, collided_sprite):
-        # method to handle collisions with another sprite (tiles or enemy)
-        pass
-
 
 class Wall(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
@@ -104,9 +76,10 @@ turret_image = pygame.transform.scale(turret_image, (75, 50))
 turret_rect = turret_image.get_rect()
 
 
-wall1 = Wall(0, 300, 3000, 20)
-wall_list.add(wall1)
-all_sprite_list.add(wall1)
+demowalls = [Wall(0, 300, 3000, 20), Wall(0, 900, 3000, 20), Wall(WIDTH-50, 0, 20, 3000), Wall(30, 0, 20, 3000)]
+wall_list.add(demowalls)
+all_sprite_list.add(demowalls)
+
 
 for monster in firstChunk.enemySpawns:
     monster.walls = wall_list
@@ -177,13 +150,18 @@ while running == True:
     #have to either keep collisions for all tiles forever
     #or kill enemies off screen; or they'll drop to top of current chunk
     #and clip through 
+        
+    monsterSpawn = False
     for chunk in chunkList:
         for tileInstance in chunk.getTiles():
             # Camera bounds
             if (tileInstance.coords[1]-camera_y > 0-TILE_PX_SIZE) and (tileInstance.coords[1]-camera_y < HEIGHT+TILE_PX_SIZE):
                 color = tileInstance.debugColor
                 if tileInstance.rect.collidepoint((mouse_x, mouse_y))and m1Click:
-                    tileInstance.destroyTile()
+                    monsterSpawn, points = tileInstance.destroyTile()
+                    score.addScore(points)
+                    # if monsterSpawn:
+                    #     # Spawn monster
                 # if color:
                     # pygame.draw.rect(screen, color, (tileInstance.coords[0], tileInstance.coords[1]-camera_y, TILE_PX_SIZE, TILE_PX_SIZE))
         # Debug: draw monster spawns
@@ -191,11 +169,11 @@ while running == True:
         #     # print(monsterInstance.debugColor, monsterInstance.spawnCoords, monsterInstance.monsterType)
         #     pygame.draw.rect(screen, monsterInstance.debugColor, (monsterInstance.spawnCoords[0], monsterInstance.spawnCoords[1]-camera_y, TILE_PX_SIZE-3, TILE_PX_SIZE-3))
     
-    for projectile in projectile_list:
-        #need to add projectile list
-        Collisions.check_projectile_collision(projectile, wall_list)
-        Collisions.check_projectile_collision(projectile, enemy_list)
-        #need to add enemy list
+    # for projectile in projectile_list:
+    #     #need to add projectile list
+    #     Collisions.check_projectile_collision(projectile, wall_list)
+    #     Collisions.check_projectile_collision(projectile, enemy_list)
+    #     #need to add enemy list
     
     
     all_sprite_list.draw(screen)
@@ -208,6 +186,14 @@ while running == True:
     rotated_turret = pygame.transform.rotate(turret_image, -angle)
     rotated_rect = rotated_turret.get_rect(center=((playerTank.rect.x+16), playerTank.rect.y))
     screen.blit(rotated_turret, rotated_rect)
+
+    score.update(globalOffset)
+    xShake, yShake = score.getShake()
+    text = font.render(str(score.delayedScore), True, (0,0,0))
+    text_rect = text.get_rect(topright=(WIDTH - 10+xShake, (10+yShake)))
+
+    # Draw text on screen
+    screen.blit(text, text_rect)
 
     pygame.display.flip()
     clock.tick(60)
