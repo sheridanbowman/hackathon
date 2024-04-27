@@ -29,7 +29,6 @@ chunkList.append(firstChunk)
 # chunkBG = pygame.image.load("assets/FREE_Fantasy Forest/Sky.png")
 # stretched_image = pygame.transform.scale(chunkBG, (300, 300))
 
-
 class Collisions:
     @staticmethod
     def check_collision(sprite,group):
@@ -61,7 +60,6 @@ class Projectile(pygame.sprite.Sprite):
         # method to handle collisions with another sprite (tiles or enemy)
         pass
 
-
 class Wall(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
         super().__init__()
@@ -73,6 +71,8 @@ class Wall(pygame.sprite.Sprite):
         self.rect.y = y
         self.rect.x = x
 
+
+    
 clock = pygame.time.Clock()
 
 background_list = initBackgroundTileGroup(screenWidth=WIDTH)
@@ -96,7 +96,6 @@ all_sprite_list.add(playerTank)
 camera_x, camera_y = 0, 0
 camLowerBound = HEIGHT // 2
 globalOffset = 0
-
 
 # Load the turret image
 turret_image = pygame.image.load("assets/player.png")
