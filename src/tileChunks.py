@@ -14,6 +14,7 @@
 import random
 import math
 from src.staticTile import staticTile
+from src.monsters import monster
 
 # TODO: backgrounds per chunk
 # TODO: ensure monster / treasure rng assignment never occurs on consecutive rows to prevent double caverns
@@ -24,9 +25,6 @@ from src.staticTile import staticTile
 
 # How many tiles to draw outside of chunk as border
 EXTRA_TILES_BOUNDARY_BUFFER = 1
-
-CAVE_BG = "assets/placeholderCaveBG.png"
-SURFACE_BG ="assets/placeholderSurfaceBG.png"
 
 # Determines chunk dimensions based on input Display resolution, pixel dimensions
 # sets global vars once, for remaining functions to reference
@@ -48,17 +46,17 @@ def setChunkDims(displayWidth:int, displayHeight:int, tileSize:int):
 def createProceduralChunk(depth:int=0, addCavernsLater=False):
     print("Creating chunk @ depth", depth)
     totalTiles = tilesPerChunkWidth * tilesPerChunkHeight
-    newChunk = tileChunk(depth, CAVE_BG)
+    newChunk = tileChunk(depth)
     unsortedTiles = []
         
     ghostEnemySpawnRate = depth*3.0
     for _ in range(int(ghostEnemySpawnRate)):
-        unsortedTiles.append(staticTile(enemySpawn="Ghost"))
+        unsortedTiles.append(staticTile(enemySpawn="lightGhost"))
 
     # flags creation of a small cavern, with just an enemy
     defaultEnemyCavernRate = (1+depth)*3.0 
     for _ in range(int(defaultEnemyCavernRate)):
-        unsortedTiles.append(staticTile(enemySpawn="Default"))
+        unsortedTiles.append(staticTile(enemySpawn="heavyGhost"))
 
     # flags creation of a small cavern, with an enemy + treasure
     treasureCavernRate = (1+depth)*3.0
@@ -109,6 +107,7 @@ def createProceduralChunk(depth:int=0, addCavernsLater=False):
     if addCavernsLater:
         newChunk.tilesArray = randomTileArray
     else:
+        newChunk.enemySpawns = assignMonsters(randomTileArray)
         newChunk.tilesArray = addCaverns(randomTileArray)
     return newChunk
 
@@ -118,7 +117,7 @@ def addCaverns(tileArray):
         index = 0
         tileIndiciesToCut = []
         for localTile in row:
-            if localTile.treasure==True or localTile.enemySpawn == "Default":
+            if localTile.treasure==True or localTile.enemySpawn == "heavyGhost":
                 numSpaces = random.randint(3, 7)
                 offsetRoot = random.randint(0, (numSpaces-1))
                 for x in range(numSpaces):
@@ -133,11 +132,21 @@ def addCaverns(tileArray):
                     row[index] = staticTile(empty=True, coords=lastTile.coords)
     return tileArray
 
+# Populate enemySpawn list for tilechunk, based on tileArray BEFORE it's had caverns added
+def assignMonsters(tileArray):
+    monsters = []
+    for row in tileArray:
+        for localTile in row:
+            if localTile.treasure:
+                monsters.append(monster(monsterType="treasureChest", spawnCoords=localTile.coords))
+            if localTile.enemySpawn:
+                monsters.append(monster(monsterType=localTile.enemySpawn, spawnCoords=localTile.coords))
+    return monsters
+
 # Initialize custom chunk
 # Defaults to 'beginning chunk' if not fed a custom 2d array
 def createCustomChunk(depth:int=0, customArray=False):
     chunk = createProceduralChunk(0, addCavernsLater=True)
-    chunk.backgroundImage = SURFACE_BG
     if customArray:
         exit("TODO: customArray gets Depth offset to Y values if used")
         chunk.tilesArray = customArray
@@ -153,7 +162,7 @@ def createCustomChunk(depth:int=0, customArray=False):
                 if rowIndex == startSpace:
                     localTile = staticTile(grass=True, coords=(xPos, yPos))
                 else:
-                    localTile = staticTile(empty=True, coords=(xPos, yPos))
+                    localTile = staticTile(backgroundEmpty=True, coords=(xPos, yPos))
                 row[itemIndex] = localTile
                 xPos+= tilesSize
             yPos+= tilesSize
@@ -169,7 +178,7 @@ def createCustomChunk(depth:int=0, customArray=False):
         soonCavern = False
         for index in range(startSpace+1, startSpace+4):
             for localTile in chunk.tilesArray[index]:
-                if localTile.treasure or localTile.enemySpawn=="Default":
+                if localTile.treasure or localTile.enemySpawn=="heavyGhost":
                     soonCavern = True
                     # print("found cavern", index)
                     break
@@ -181,6 +190,7 @@ def createCustomChunk(depth:int=0, customArray=False):
             lastTile = chunk.tilesArray[startSpace+3][tilesPerChunkWidth//2]
             chunk.tilesArray[startSpace+3][tilesPerChunkWidth//2] = staticTile(treasure=True, coords=lastTile.coords)
 
+    chunk.enemySpawns = assignMonsters(chunk.tilesArray)
     chunk.tilesArray = addCaverns(chunk.tilesArray)
 
     return chunk
@@ -191,9 +201,8 @@ class tileChunk:
     # background: Path of image to load behind tiles
     # tilesArray: initialized array to hold tile assignments
     # enemySpawns: list of enemy spawns to initialize on chunk load
-    def __init__(self, depth: int, backgroundImage: str):
+    def __init__(self, depth: int):
         self.depth = depth
-        self.backgroundImage = backgroundImage
         self.tilesArray = None
         self.enemySpawns = None
         self.tilesPerChunkHeight = tilesPerChunkHeight
