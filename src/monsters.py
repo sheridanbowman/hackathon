@@ -46,7 +46,6 @@ class monster(pygame.sprite.Sprite):
 
 
     def update(self, pressed_keys):
-
         self.gravityAccel = min(self.max_speed, self.gravityAccel + self.gravityMult)
         self.change_y +=self.gravityAccel
 
@@ -65,7 +64,6 @@ class monster(pygame.sprite.Sprite):
             else:
                 self.rect.left = wall.rect.right
 
-            
             if self.change_y > 0:
 
                 self.change_y = 0
@@ -73,3 +71,5 @@ class monster(pygame.sprite.Sprite):
                 self.rect.bottom = wall.rect.top
             else:
                 self.rect.top = wall.rect.bottom
+            
+        

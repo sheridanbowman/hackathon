@@ -90,7 +90,7 @@ class Tank(pygame.sprite.Sprite):
         self.change_y +=self.gravityAccel
 
         self.rect.x += self.change_x
-        self.rect.y += (self.change_y)
+        self.rect.y += max(-9, min(9, self.change_y))
         # self.rect.y +=1
         # print(self.jumpDuration)
         
