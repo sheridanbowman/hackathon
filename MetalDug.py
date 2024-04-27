@@ -76,9 +76,10 @@ turret_image = pygame.transform.scale(turret_image, (75, 50))
 turret_rect = turret_image.get_rect()
 
 
-wall1 = Wall(0, 300, 3000, 20)
-wall_list.add(wall1)
-all_sprite_list.add(wall1)
+demowalls = [Wall(0, 300, 3000, 20), Wall(0, 900, 3000, 20), Wall(WIDTH-50, 0, 20, 3000), Wall(30, 0, 20, 3000)]
+wall_list.add(demowalls)
+all_sprite_list.add(demowalls)
+
 
 for monster in firstChunk.enemySpawns:
     monster.walls = wall_list

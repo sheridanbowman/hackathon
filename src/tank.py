@@ -110,13 +110,27 @@ class Tank(pygame.sprite.Sprite):
         # does the same as above, but with up and down
         # collide_list = pygame.sprite.spritecollide(self, self.walls, False)
         for wall in collide_list:
-            if self.change_y > 0:
 
-                # Reset jump
-                self.jumpDuration = 0
+            if self.rect.right >= wall.rect.left and self.rect.left <= wall.rect.left:
+                self.rect.right = wall.rect.left
+                # print("Collision betwen sprite and the left side")
+            elif self.rect.left <= wall.rect.right and self.rect.right >= wall.rect.right:
+                self.rect.left = wall.rect.right
+                # print("Collision betwen sprite and the right side")
+            elif self.rect.bottom >= wall.rect.top and self.rect.top <= wall.rect.top:
+                # print("Collision betwen sprite and the top side")
+                if self.change_y > 0:
 
-                self.change_y = 0
-                self.gravityAccel = 0
-                self.rect.bottom = wall.rect.top
-            else:
-                self.rect.top = wall.rect.bottom
+                    # Reset jump
+                    self.jumpDuration = 0
+
+                    self.change_y = 0
+                    self.gravityAccel = 0
+                    self.rect.bottom = wall.rect.top
+                else:
+                    self.rect.top = wall.rect.bottom
+            # elif self.rect.top <= wall.rect.bottom and self.rect.bottom >= wall.rect.bottom:
+                # print("Collision betwen sprite and the bottom side")
+            # print(self.rect.bottom, wall.rect.top, self.rect.bottom>wall.rect.top)
+            # Collision below?
+            
