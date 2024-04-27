@@ -56,10 +56,6 @@ class Collisions:
                 # Collision are handled
                 projectile.handle_collision(target)
 
-class Projectile(pygame.sprite.Sprite):
-    def handle_collision(self, collided_sprite):
-        # method to handle collisions with another sprite (tiles or enemy)
-        pass
 
 
 class Wall(pygame.sprite.Sprite):
@@ -84,6 +80,7 @@ for tile in firstChunk.getTiles():
 
 all_sprite_list = pygame.sprite.Group()
 wall_list = pygame.sprite.Group()
+projectile_list = pygame.sprite.Group()
 
 # sprite.Group() lets you use the collide function as detailed above.
 # It also allows you to call the update() function for all the sprites
@@ -191,13 +188,21 @@ while running == True:
         #     # print(monsterInstance.debugColor, monsterInstance.spawnCoords, monsterInstance.monsterType)
         #     pygame.draw.rect(screen, monsterInstance.debugColor, (monsterInstance.spawnCoords[0], monsterInstance.spawnCoords[1]-camera_y, TILE_PX_SIZE-3, TILE_PX_SIZE-3))
     
+    for event in pygame.event.get():
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                angle = get_angle(tank.x + player.width / 2, player.y + player.height / 2, mouse_x, mouse_y)
+                projectile = Projectile(playerTank.rect.centerx, playerTank.rect.centery, angle)
+                projectile_list.add(projectile)
+
+    projectile_list.update()
+    projectile_list.draw(screen)
+
     for projectile in projectile_list:
-        #need to add projectile list
-        Collisions.check_projectile_collision(projectile, wall_list)
-        Collisions.check_projectile_collision(projectile, enemy_list)
-        #need to add enemy list
-    
-    
+        Collisions.check_wall_collision(projectile, wall_list)
+        Collisions.check_collision(projectile, enemy_list)
+        #need enemylist
+
     all_sprite_list.draw(screen)
 
     # Turret logic
