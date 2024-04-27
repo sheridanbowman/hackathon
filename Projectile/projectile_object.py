@@ -2,13 +2,14 @@ import pygame
 import math
 import random
 
+
 # Initialize Pygame
 pygame.init()
 
 # Screen dimensions and frame rate
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 1000
-FRAME_RATE = 20
+FRAME_RATE = 60
 
 # Set up the display
 win = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -70,7 +71,7 @@ class Projectile(Collisions):
         self.radius = radius
         self.color = color
         self.angle = angle
-        self.speed = 10
+        self.speed = 50
 
     def draw(self, win):
         pygame.draw.circle(win, self.color, (int(self.x + self.radius), int(self.y + self.radius)), self.radius)
@@ -119,7 +120,6 @@ while run:
 
     # Remove projectiles that go off-screen
     projectiles = [bullet for bullet in projectiles if 0 < bullet.x < SCREEN_WIDTH and 0 < bullet.y < SCREEN_HEIGHT]
-
     # Check for collisions between projectiles and the sprite
     for bullet in projectiles:
         if sprite.collide(bullet):
