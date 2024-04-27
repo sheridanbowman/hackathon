@@ -4,7 +4,13 @@ from pygame.locals import *
 
 BG_WIDTH = 320
 
-def initBackgroundTileGroup(screenWidth):
+CAVE_BG_WIDTH = 256
+CAVE_BG_HEIGHT = 224
+
+def initCaveBackgroundTileGroup(screenWidth, screenHeight):
+    pass
+
+def initSurfaceBackgroundTileGroup(screenWidth):
     background_list = pygame.sprite.Group()
     backgroundScale = 1.25
     backgroundWidth = 320 * backgroundScale

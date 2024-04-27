@@ -18,6 +18,8 @@ class Tank(pygame.sprite.Sprite):
 
         self.walls = None
 
+        self.direction = 1 # Changed by keypress, determines which side tanks rendered facing
+
         self.acceleration = 0.05
         self.deceleration = 0.15
         self.max_speed = 3
@@ -64,12 +66,14 @@ class Tank(pygame.sprite.Sprite):
                 self.change_y += self.acceleration
 
         if pressed_keys[K_a]:
+            self.direction = 0
             self.change_speed(-self.acceleration, 0)
             not_moving = False
         elif self.change_x < 0:
             self.change_x += self.deceleration
 
         if pressed_keys[K_d]:
+            self.direction = 1
             self.change_speed(self.acceleration, 0)
             not_moving = False
         elif self.change_x > 0:
@@ -119,18 +123,29 @@ class Tank(pygame.sprite.Sprite):
                 # print("Collision betwen sprite and the right side")
             elif self.rect.bottom >= wall.rect.top and self.rect.top <= wall.rect.top:
                 # print("Collision betwen sprite and the top side")
-                if self.change_y > 0:
+                # if self.change_y > 0:
+                # Reset jump
+                self.jumpDuration = 0
 
-                    # Reset jump
-                    self.jumpDuration = 0
-
-                    self.change_y = 0
-                    self.gravityAccel = 0
-                    self.rect.bottom = wall.rect.top
-                else:
-                    self.rect.top = wall.rect.bottom
-            # elif self.rect.top <= wall.rect.bottom and self.rect.bottom >= wall.rect.bottom:
+                self.change_y = 0
+                self.gravityAccel = 0
+                self.rect.bottom = wall.rect.top
+            elif self.rect.top <= wall.rect.bottom and self.rect.bottom >= wall.rect.bottom:
                 # print("Collision betwen sprite and the bottom side")
+                self.rect.top = wall.rect.bottom
+                self.change_y = 0
             # print(self.rect.bottom, wall.rect.top, self.rect.bottom>wall.rect.top)
             # Collision below?
+        
+
+        movepanels = self.rightpanels
+        mainpanel = movepanels[1]
+
+        if self.direction == 1: 
+            movepanels = self.leftpanels
+        # render alt move frame on odd pixel counts
+        if self.rect.x % 2 == 0:
+            mainpanel = movepanels[0]
+
+        # draw main panel
             

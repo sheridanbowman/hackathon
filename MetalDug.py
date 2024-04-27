@@ -1,6 +1,7 @@
 import pygame
 import math
-from src.background import BackgroundImage, initBackgroundTileGroup
+from src.monsters import Monster
+from src.background import BackgroundImage, initCaveBackgroundTileGroup, initSurfaceBackgroundTileGroup
 from src.staticTile import staticTile
 from src.tileChunks import setChunkDims, createProceduralChunk, createCustomChunk
 from src.score import ScoreCounter
@@ -18,14 +19,30 @@ CHUNK_HEIGHT, CHUNK_WIDTH = setChunkDims(WIDTH, HEIGHT, TILE_PX_SIZE)
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
 pygame.display.set_caption('My Game')
 
+# Groups to update
+tile_list = pygame.sprite.Group()
+all_sprite_list = pygame.sprite.Group()
+wall_list = pygame.sprite.Group()
 
+# Initialize score counter
 score = ScoreCounter(0,0,0)
 pygame.font.init()
 font = pygame.font.Font("assets/m5x7/m5x7.ttf", 36)
-# Demo of start level
+
+# Load first chunk
 firstChunk = createCustomChunk()
 chunkList = []
 chunkList.append(firstChunk)
+
+# add tiles to be updated
+for tile in firstChunk.getTiles():
+    if not tile.backgroundEmpty:
+        tile_list.add(tile)
+
+# Add monsters to spawn
+for monster in firstChunk.enemySpawns:
+    monster.walls = wall_list
+    all_sprite_list.add(monster)
 
 # Demo of procedural level at depth X>0 
 # depth = 1
@@ -47,15 +64,8 @@ class Wall(pygame.sprite.Sprite):
 
 clock = pygame.time.Clock()
 
-background_list = initBackgroundTileGroup(screenWidth=WIDTH)
+background_list = initSurfaceBackgroundTileGroup(screenWidth=WIDTH)
 
-tile_list = pygame.sprite.Group()
-for tile in firstChunk.getTiles():
-    if not tile.backgroundEmpty:
-        tile_list.add(tile)
-
-all_sprite_list = pygame.sprite.Group()
-wall_list = pygame.sprite.Group()
 
 # sprite.Group() lets you use the collide function as detailed above.
 # It also allows you to call the update() function for all the sprites
@@ -81,9 +91,7 @@ wall_list.add(demowalls)
 all_sprite_list.add(demowalls)
 
 
-for monster in firstChunk.enemySpawns:
-    monster.walls = wall_list
-    all_sprite_list.add(monster)
+
 
 # wall2 = Wall(HEIGHT-40, 200, 3000, 20)
 # wall_list.add(wall2)
@@ -160,8 +168,9 @@ while running == True:
                 if tileInstance.rect.collidepoint((mouse_x, mouse_y))and m1Click:
                     monsterSpawn, points = tileInstance.destroyTile()
                     score.addScore(points)
-                    # if monsterSpawn:
-                    #     # Spawn monster
+                    if monsterSpawn:
+                        all_sprite_list.add(Monster(monsterType="gem", spawnCoords=tileInstance.coords, walls=wall_list))
+                        # Spawn monster
                 # if color:
                     # pygame.draw.rect(screen, color, (tileInstance.coords[0], tileInstance.coords[1]-camera_y, TILE_PX_SIZE, TILE_PX_SIZE))
         # Debug: draw monster spawns
