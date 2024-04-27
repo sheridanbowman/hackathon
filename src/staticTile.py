@@ -52,23 +52,27 @@ class staticTile(pygame.sprite.Sprite):
         # self.rect.x, self.rect.y = self.coords
         # print(self.rect.topleft, self.coords, self.grass, self.empty)
 
+    # Handles logic for destroying a tile
+    # Returns points to add, 'monster' type to spawn, and coordinates to spawn it
     def destroyTile(self):
-        # if self.gem:  
-        #     # TODO: Spawn gem
+        monsterSpawn = False
+        points = 10
+        spawnCoords = False
+        if self.gem:  
+            monsterSpawn = "gem"
+            spawnCoords = self.coords
         if not (self.empty or self.backgroundEmpty or self.boundary):
-            print("destroyed!")
             self.empty = True
             self.grass = False
             self.default = False
             self.gem = False
-            self.image.fill((0,0,0))
-        # TODO: update pixel w. new flags
+            self.image.fill((0,0,0)) # <---- TODO: replace with sprite
+        return monsterSpawn, points, self.coords
             
     def update(self, yOffset):
         # print(self.rect.x, self.rect.y)
         self.rect.x = self.coords[0]
         self.rect.y = self.coords[1] + yOffset
-
         
 
 

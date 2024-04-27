@@ -14,7 +14,7 @@
 import random
 import math
 from src.staticTile import staticTile
-from src.monsters import monster
+from src.monsters import Monster
 
 # TODO: backgrounds per chunk
 # TODO: ensure monster / treasure rng assignment never occurs on consecutive rows to prevent double caverns
@@ -138,9 +138,9 @@ def assignMonsters(tileArray):
     for row in tileArray:
         for localTile in row:
             if localTile.treasure:
-                monsters.append(monster(monsterType="treasureChest", spawnCoords=localTile.coords))
+                monsters.append(Monster(monsterType="treasureChest", spawnCoords=localTile.coords))
             if localTile.enemySpawn:
-                monsters.append(monster(monsterType=localTile.enemySpawn, spawnCoords=localTile.coords))
+                monsters.append(Monster(monsterType=localTile.enemySpawn, spawnCoords=localTile.coords))
     return monsters
 
 # Initialize custom chunk
