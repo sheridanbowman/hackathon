@@ -182,41 +182,92 @@ class Tank(pygame.sprite.Sprite):
         #     # print(self.rect.bottom, wall.rect.top, self.rect.bottom>wall.rect.top)
         #     # Collision below?
 
-        self.rect.x += self.change_x
+        # self.rect.x += self.change_x
+        # self.rect.y += max(-9, min(9, self.change_y))
+        # if not debugMode:
+        #     for wall in collide_list:
+        #         # Check for collision with the top side of the wall
+        #         if self.rect.bottom >= wall.rect.top and self.rect.top < wall.rect.top:
+        #             if self.change_y > 0.0:  # Moving upward
+        #                 print("botcollide")
+        #                 self.rect.bottom = wall.rect.top
+        #             # Reset jump
+        #             self.jumpDuration = 0
+        #             self.change_y = 0
+        #             self.gravityAccel = 0
+
+        #          # Check for collision with the bottom side of the wall
+        #         elif self.rect.top <= wall.rect.bottom and self.rect.bottom > wall.rect.bottom:
+        #             print("sprite collides with bottom ", self.rect.top, wall.rect.bottom)
+        #             if self.change_y < 0.0:  # Moving upward
+        #                 self.rect.top = wall.rect.bottom
+        #                 self.change_y = 0
+        #                 print(self.rect.bottom , wall.rect.top)
+
+
+
+        #         # Check for collision with the right side of the wall
+        #         elif self.rect.left <= wall.rect.right and self.rect.right > wall.rect.right:
+        #             print("sprite collides with right of block", 
+        #                   self.rect.left, self.rect.right, wall.rect.left, wall.rect.right, self.change_x)
+        #             if self.change_x < 0:  # Moving left
+        #                 self.rect.left = wall.rect.right
+        #                 self.change_x = (self.change_x*-1)//2
+
+        #             # if self.change_x < 0:  # Moving left
+                        
+
+        #         # Check for collision with the left side of the wall
+        #         elif self.rect.right >= wall.rect.left and self.rect.left < wall.rect.left:
+        #             print("sprite collides with left of block")
+        #             if self.change_x > 0:  # Moving left
+        #                 self.rect.right = wall.rect.left
+        #                 self.change_x = (self.change_x*-1)//2
+
+        
         self.rect.y += max(-9, min(9, self.change_y))
         if not debugMode:
             for wall in collide_list:
-                # Check for collision with the top side of the wall
-                if self.rect.bottom >= wall.rect.top and self.rect.top < wall.rect.top:
-                    # print("botcollide")
-                    self.rect.bottom = wall.rect.top
-                    # Reset jump
-                    self.jumpDuration = 0
-                    self.change_y = 0
-                    self.gravityAccel = 0
-
-                # Check for collision with the bottom side of the wall
-                elif self.rect.top <= wall.rect.bottom and self.rect.bottom < wall.rect.bottom:
-                    print("topcollide", self.rect.top, wall.rect.bottom)
-                    if self.change_y >= 0:  # Moving downward
-                        self.rect.top = wall.rect.bottom
+                if abs(wall.rect.left - self.rect.right) >5 and wall.rect.right - self.rect.left >5:
+                    # Check for collision with the top side of the wall
+                    if self.rect.bottom >= wall.rect.top and self.rect.top < wall.rect.top:
+                        if self.change_y > 0.0:  # Moving upward
+                            # print("botcollide")
+                            self.rect.bottom = wall.rect.top
+                        # Reset jump
+                        self.jumpDuration = 0
                         self.change_y = 0
+                        self.gravityAccel = 0
 
+                    # Check for collision with the bottom side of the wall
+                    elif self.rect.top <= wall.rect.bottom and self.rect.bottom > wall.rect.bottom:
+                        # print("sprite collides with bottom ", self.rect.top, wall.rect.bottom)
+                        if self.change_y < 0.0:  # Moving upward
+                            self.rect.top = wall.rect.bottom
+                            self.change_y = 0
+                            print(self.rect.bottom , wall.rect.top)
+
+            self.rect.x += self.change_x
+            for wall in collide_list:
                 # Check for collision with the right side of the wall
-                elif self.rect.left <= wall.rect.right and self.rect.right > wall.rect.right:
-                    print("rightcollide", self.rect.left, wall.rect.right, wall.rect.left, self.change_x)
-                    if self.change_x < 0:  # Moving left
-                        self.change_x = 0
-                        self.rect.right = wall.rect.left
-                    # if self.change_x < 0:  # Moving left
-                        
+                if wall.rect.top < self.rect.bottom and wall.rect.bottom > self.rect.top:
+                    if self.rect.left <= wall.rect.right and self.rect.right > wall.rect.right:
+                        # print("sprite collides with right of block",self.rect.left, self.rect.right, wall.rect.left, wall.rect.right, self.change_x)
+                        if self.change_x < 0:  # Moving left
+                            self.rect.left = wall.rect.right
+                            self.change_x = 0
 
-                # Check for collision with the left side of the wall
-                elif self.rect.right >= wall.rect.left and self.rect.left < wall.rect.left:
-                    print("leftcollide")
-                    if self.change_x > 0:  # Moving left
-                        self.rect.left = wall.rect.right
-                        self.change_x = 0
+                        # if self.change_x < 0:  # Moving left
+                            
+
+                    # Check for collision with the left side of the wall
+                    elif self.rect.right >= wall.rect.left and self.rect.left < wall.rect.left:
+                        # print("sprite collides with left of block")
+                        if self.change_x > 0:  # Moving left
+                            self.rect.right = wall.rect.left
+                            self.change_x = 0
+
+
             
             # print(self.rect.bottom, wall.rect.top, self.rect.bottom>wall.rect.top)
             # Collision below?

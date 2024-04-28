@@ -17,6 +17,10 @@ sounds
 
 Collisions, sprites?
 
+3 distinct ghost move patterns
+
+3 ghost spawn rates
+
 1 chest per chunk with rng stat boost, health
 
 self explosion knockback
@@ -40,3 +44,7 @@ rng gem size and color values
                                                                                                                     gem decals on dirt
 
 points on gem coll only
+
+clean up load func with global vars
+
+gem rng offset on spawn to prevent overlap
