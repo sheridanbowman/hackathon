@@ -54,24 +54,35 @@ class SpriteSheet:
     #     self.animation_list = [
     #         self.get_image(i) for i in range(self.animation_steps)
     #     ]
-    def __init__(self, image_path, num_actions, frames_per_action):
+    def __init__(self, image_path, num_actions, frames_per_action, animation_cooldown=100, xDim=32, yDim=32, numFrames=2, current_action=0):
         self.sheet = pygame.image.load(image_path).convert_alpha()
         self.num_actions = num_actions
         self.frames_per_action = frames_per_action
         self.actions = [[] for _ in range(num_actions)]
-        self.current_action = 0
-        self.animation_cooldown = 100
-        self.last_update = pygame.time.get_ticks()
-        self.frame = 0
-        self.load_images(32, 32, 2, BLACK)   
 
-    def load_images(self, width, height, scale, color):
+        # The 'row' or 'action' to begin on
+        self.current_action = current_action
+
+        # ticks to pause for
+        self.animation_cooldown = animation_cooldown
+
+        self.last_update = pygame.time.get_ticks()
+
+        # Current frame
+        self.frame = 0
+
+        # Fill self.actions with frames
+        self.load_images(xDim, yDim, numFrames)   
+
+    
+
+    def load_images(self, width, height, scale):
         for action in range(self.num_actions):
             for frame in range(self.frames_per_action):
-                self.actions[action].append(self.get_image(frame, action, width, height, scale, color))
+                self.actions[action].append(self.get_image(frame, action, width, height, scale))
 
 
-    def get_image(self, frame, row, width, height, scale, color):
+    def get_image(self, frame, row, width, height, scale):
         # image = pygame.Surface((self.frame_width, self.frame_height)).convert_alpha()
         # image.blit(self.sheet, (0, 0), (frame * self.frame_width, 0, self.frame_width, self.frame_height))
         # image = pygame.transform.scale(image, (self.frame_width * self.scale, self.frame_height * self.scale))
@@ -80,10 +91,10 @@ class SpriteSheet:
         image = pygame.Surface((width, height), pygame.SRCALPHA)
         image.blit(self.sheet, (0, 0), ((frame * width), (row * height), width, height))
         image = pygame.transform.scale(image, (width * scale, height * scale))
-        image.set_colorkey(color)
+        image.set_colorkey(BLACK)
         return image
 
-    def update(self):
+    def updateSpriteSheet(self):
         current_time = pygame.time.get_ticks()
         if current_time - self.last_update >= self.animation_cooldown:
             self.frame += 1
@@ -91,15 +102,19 @@ class SpriteSheet:
             if self.frame >= len(self.actions[self.current_action]):
                 self.frame = 0
 
+    # Swap to action X
     def set_action(self, action_index):
-        if action_index < self.num_actions:
+        if action_index <= self.num_actions:
             self.current_action = action_index
             self.frame = 0
+        else: 
+            exit("Tried loading row", action_index, "out of", self.num_actions)
         
 
     def draw(self, screen):
         # screen.blit(self.animation_list[self.frame], (x, y))
         screen.blit(self.actions[self.current_action][self.frame], (SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
+
 
 # Usage example:
 pygame.init()

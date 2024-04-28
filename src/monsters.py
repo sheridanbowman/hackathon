@@ -1,6 +1,8 @@
 import pygame
 from pygame.locals import *
 
+
+
 import random
 
 # Class for 'monster' type objects that can be spawned; and have collision options: includes gems and chests
