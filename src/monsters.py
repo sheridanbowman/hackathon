@@ -12,7 +12,7 @@ validMonsters = ["heavyGhost", "treasureChest", "lightGhost", "gem", "projectile
 moveTypes = ["flyToTarget", "walk", "seek", "static"]
 
 class Monster(pygame.sprite.Sprite):
-    def __init__(self, monsterType:str, walls=None, spawnCoords:tuple[int, int] = (0,0), targetCoords:tuple[int, int] = (0,0)):
+    def __init__(self, monsterType:str, walls=None, spawnCoords:tuple[int, int] = (0,0), targetCoords:tuple[int, int] = (0,0), enable_destroy_radius: bool = False):
         super(Monster, self).__init__()
         
         if monsterType in validMonsters:
@@ -70,7 +70,33 @@ class Monster(pygame.sprite.Sprite):
         self.gravityMult = 0.01
         self.gravityAccel = 0  # Constant ramping acceleration due to gravity
 
+        #enables or disables "destroy radius" function depending if we want certain sprites to have it
+        self.enable_destroy_radius = enable_destroy_radius
+        if self.enable_destroy_radius:
+            self.enable_destroy_radius = 5
 
+    def handle_collision(self, projectile_sprite=None, explosion_animation = None):
+        #checks for collision with projectile
+        if projectile_sprite and pygame.sprite.collide_rect(self, projectile_sprite):
+            self.explode(explosion_animation) #spawn explosion animation
+            if self.enable_destroy_radius:
+                self.set_destroy_radius(projectile_sprite)
+
+
+    def explode(self, explosion_animation):
+        #explosion animation
+        """explosion = Explosion(self.rect.center)"""
+        """Need to create an Explosion Class"""
+        """explosion_animation.add(explosion)"""
+        pygame.draw.circle(explosion_animation, (255, 0, 0), self.rect.center, 50)
+        #despawn monster sprite
+        self.kill()
+
+    def set_destroy_radius(self, projectile_sprite):
+        #sets destroy radius >:)
+        if pygame.sprite.collide_circle(self, projectile_sprite):
+                #removes projectile as necessary
+                projectile_sprite.kill()
 
     def update(self, pressed_keys):
         self.gravityAccel = min(self.max_speed, self.gravityAccel + self.gravityMult)

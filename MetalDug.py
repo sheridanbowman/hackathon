@@ -185,7 +185,12 @@ while running == True:
     #     Collisions.check_projectile_collision(projectile, enemy_list)
     #     #need to add enemy list
     
-    
+    for event in pygame.event.get():
+    # Existing code...
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:  # Left mouse button
+                playerTank.shoot_projectile()
+                
 
 
 

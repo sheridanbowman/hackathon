@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 
-class staticTile(pygame.sprite.Sprite):
+class staticTile (pygame.sprite.Sprite):
     def __init__(self, enemySpawn=False, 
                  default: bool = False, treasure: bool = False, 
                  gem: bool = False, empty:bool = False, grass:bool = False, 
