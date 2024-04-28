@@ -152,7 +152,8 @@ def createCustomChunk(depth:int=0, customArray=False):
         chunk.tilesArray = customArray
     else:
         # Fill the first 1/4 with empty space, then a row of grass
-        startSpace = int(tilesPerChunkHeight*0.25)
+        # startSpace = int(tilesPerChunkHeight*0.25)
+        startSpace = 8
         yPos = depth * tilesPerChunkHeight * tilesSize
         for rowIndex in range(startSpace+1):
             row = chunk.tilesArray[rowIndex]

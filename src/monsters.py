@@ -118,8 +118,8 @@ class Monster(pygame.sprite.Sprite):
                     self.change_y = 0
                     self.gravityAccel = 0
                     self.rect.bottom = wall.rect.top
-                elif self.rect.top <= wall.rect.bottom and self.rect.bottom >= wall.rect.bottom:
-                    print("Collision betwen sprite and the bottom side")    
+                # elif self.rect.top <= wall.rect.bottom and self.rect.bottom >= wall.rect.bottom:
+                #     print("Collision betwen sprite and the bottom side")    
             # if self.monsterType == "projectile":
             #     # Also has enemy sprite collision
             #     # spawn explosion at coord

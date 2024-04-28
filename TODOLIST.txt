@@ -1,0 +1,42 @@
+
+
+                                                                                                                tracking turret nozzle
+
+                                                                                                                Turret head sprite
+
+                                                                                                                End game screen
+
+                                                                                                                literal tank tiles
+
+                                                                                                                score counter increment faster based on different
+
+                                                                                                        
+Swap to arcade NES font
+
+sounds
+
+Collisions, sprites?
+
+1 chest per chunk with rng stat boost, health
+
+self explosion knockback
+
+player and sprites get updated walls list when new walls? shuold be default
+
+Zoom in, static bg if have to
+
+add cursor target
+
+instructions start menu
+
+                                                                                                                remove score shake
+
+add screenshake
+
+rng gem size and color values
+
+                                                                                                                        tile overdraw
+
+                                                                                                                    gem decals on dirt
+
+points on gem coll only
