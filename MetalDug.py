@@ -1,5 +1,6 @@
 import pygame
 import math
+#from src.projectile import Projectile
 from src.monsters import Monster
 from src.background import BackgroundImage, initCaveBackgroundTileGroup, initSurfaceBackgroundTileGroup
 from src.staticTile import staticTile
@@ -51,38 +52,6 @@ for monster in firstChunk.enemySpawns:
 # chunkBG = pygame.image.load("assets/FREE_Fantasy Forest/Sky.png")
 # stretched_image = pygame.transform.scale(chunkBG, (300, 300))
 
-<<<<<<< HEAD
-
-class Collisions:
-    @staticmethod
-    def check_collision(sprite,group):
-        #checks collision between sprites
-        collisions = pygame.sprite.spritecollide(sprite,group, False)
-        return collisions
-    @staticmethod
-    def check_wall_collision(sprite, wall_group):
-        #checks collision between sprite and walls.
-        collisions = pygame.sprite.spritecollide(sprite, wall_group, False)
-        for wall in collisions:
-            if pygame.sprite.collide_rect(sprite, wall):
-                if sprite.rect.bottom > wall.rect.top and sprite.rect.top < wall.rect.bottom:
-                    if sprite.rect.right > wall.rect.left and sprite.rect.left < wall.rect.right:
-                        # Collision will be handled.
-                        sprite.handle_collision(wall)
-
-    @staticmethod
-    def check_projectile_collision(projectile, target_group):
-        #checks collision between projectiles and targets
-        collisions = pygame.sprite.spritecollide(projectile, target_group, False)
-        for target in collisions:
-            if pygame.sprite.collide_rect(projectile, target):
-                # Collision are handled
-                projectile.handle_collision(target)
-
-
-
-=======
->>>>>>> 82389e1246a08d1db187edd657fa2549aa580e39
 class Wall(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
         super().__init__()
@@ -98,17 +67,6 @@ clock = pygame.time.Clock()
 
 background_list = initSurfaceBackgroundTileGroup(screenWidth=WIDTH)
 
-<<<<<<< HEAD
-tile_list = pygame.sprite.Group()
-for tile in firstChunk.getTiles():
-    if not tile.backgroundEmpty:
-        tile_list.add(tile)
-
-all_sprite_list = pygame.sprite.Group()
-wall_list = pygame.sprite.Group()
-projectile_list = pygame.sprite.Group()
-=======
->>>>>>> 82389e1246a08d1db187edd657fa2549aa580e39
 
 # sprite.Group() lets you use the collide function as detailed above.
 # It also allows you to call the update() function for all the sprites
@@ -221,23 +179,6 @@ while running == True:
         #     # print(monsterInstance.debugColor, monsterInstance.spawnCoords, monsterInstance.monsterType)
         #     pygame.draw.rect(screen, monsterInstance.debugColor, (monsterInstance.spawnCoords[0], monsterInstance.spawnCoords[1]-camera_y, TILE_PX_SIZE-3, TILE_PX_SIZE-3))
     
-<<<<<<< HEAD
-    for event in pygame.event.get():
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:
-                angle = get_angle(tank.x + player.width / 2, player.y + player.height / 2, mouse_x, mouse_y)
-                projectile = Projectile(playerTank.rect.centerx, playerTank.rect.centery, angle)
-                projectile_list.add(projectile)
-
-    projectile_list.update()
-    projectile_list.draw(screen)
-
-    for projectile in projectile_list:
-        Collisions.check_wall_collision(projectile, wall_list)
-        Collisions.check_collision(projectile, enemy_list)
-        #need enemylist
-
-=======
     # for projectile in projectile_list:
     #     #need to add projectile list
     #     Collisions.check_projectile_collision(projectile, wall_list)
@@ -245,7 +186,10 @@ while running == True:
     #     #need to add enemy list
     
     
->>>>>>> 82389e1246a08d1db187edd657fa2549aa580e39
+
+
+
+
     all_sprite_list.draw(screen)
 
     # Turret logic

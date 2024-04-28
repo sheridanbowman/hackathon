@@ -138,7 +138,7 @@ class Tank(pygame.sprite.Sprite):
             # Collision below?
         
 
-        movepanels = self.rightpanels
+        """movepanels = self.rightpanels
         mainpanel = movepanels[1]
 
         if self.direction == 1: 
@@ -148,4 +148,4 @@ class Tank(pygame.sprite.Sprite):
             mainpanel = movepanels[0]
 
         # draw main panel
-            
+            """
