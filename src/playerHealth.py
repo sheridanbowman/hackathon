@@ -3,6 +3,7 @@ import pygame
 class PlayerHealth(pygame.sprite.Sprite):
     def __init__(self, screenHeight, startHealth=5):
         super().__init__()
+        self.collision=False
         self.health = startHealth
         self.full_health_icon = pygame.image.load('assets/fullHealthIcon.png').convert_alpha()
         self.empty_health_icon = pygame.image.load('assets/gradientDemo.png').convert_alpha()

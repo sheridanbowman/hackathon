@@ -1,34 +1,59 @@
 import pygame
 from pygame.locals import *
 from src.spritesheet import SpriteSheet
+from src.playerHealth import PlayerHealth
+from src.tank import Tank
+from src.score import ScoreCounter
 
+import math
 import random
 
 # Class for 'monster' type objects that can be spawned; and have collision options: includes gems and chests
 
 # monsterType: type of monster, ["heavyGhost", "treasureChest", "lightGhost", "gem"]
-# affectedByGravity: whether it's affected by gravity
 # spawnCoords: where the monster spawns
-validMonsters = ["heavyGhost", "treasureChest", "lightGhost", "gem", "projectile"]
+validMonsters = ["heavyGhost", "treasureChest", "lightGhost", "gem", "projectile", "explosion"]
 moveTypes = ["flyToTarget", "walk", "seek", "static"]
 
+def move_towards_target(x1, y1, x2, y2, speed):
+
+    angle = math.atan2(y2 - y1, x2 - x1)
+
+    speed_x = math.cos(angle) * speed
+    speed_y = math.sin(angle) * speed
+
+    return speed_x, speed_y
+
+def casualty(rect1, rect2, radius):
+    center1 = rect1.center
+    center2 = rect2.center
+    distance = math.sqrt((center2[0] - center1[0])**2 + (center2[1] - center1[1])**2)
+    # print(distance, radius)
+    if distance < radius:
+        return True
+    return False
+
+THRESHOLD = 10
+
 class Monster(pygame.sprite.Sprite):
-    def __init__(self, monsterType:str, walls=None, spawnCoords:tuple[int, int] = (0,0), targetCoords:tuple[int, int] = (0,0)):
+    def __init__(self, monsterType:str, walls=None, spawnCoords:tuple[int, int] = (0,0), targetCoords:tuple[int, int] = (0,0), 
+                 allSprites=None,scoreHandle = None, playerHandle = None, health_Handle=None, explosionRadius= 60):
         super(Monster, self).__init__()
         
         if monsterType in validMonsters:
             self.monsterType = monsterType
         else:
             exit("Trying to assign a monster type that doesnt exist!", monsterType, validMonsters)
-        
-        self.affectedByGravity = None 
-        if self.monsterType in ["heavyGhost", "treasureChest", "gem"]:
-            self.affectedByGravity = True
-        if self.monsterType in ["projectile", "lightGhost"]:
-            self.affectedByGravity = False
-        
+
+        self.collision = True
+        self.scoreHandle = scoreHandle
+        self.playerHandle = playerHandle
         self.spawnCoords = spawnCoords
+        self.allSprites=allSprites
         self.walls = walls
+        self.explosionRadius=explosionRadius
+
+        self.health_Handle = health_Handle
 
         self.debugColor = None # for debugging tile spawn locations
 
@@ -41,11 +66,16 @@ class Monster(pygame.sprite.Sprite):
         if self.xMoveDirection == 0:
             self.xMoveDirection = -1
         self.image = pygame.image.load('assets/player.png')
+        self.rect = self.image.get_rect()
+        self.rect.x = self.spawnCoords[0]
+        self.rect.y = self.spawnCoords[1]
+
         self.chestType = random.randint(0,3)*2
         if monsterType == "heavyGhost":
             self.debugColor = (255, 0, 0)
             self.moveType = "walk"
-
+            self.xSpeed=2
+            self.ySpeed=0
                 
             self.spriteSheet = SpriteSheet(image_path="assets/ghostSheetCombined.png",num_actions=2,frames_per_action=7, scale=0.75, animation_cooldown=200) 
             self.image=self.spriteSheet.currImage
@@ -53,19 +83,26 @@ class Monster(pygame.sprite.Sprite):
         if monsterType == "lightGhost":
             self.debugColor = (192, 192, 192)
             self.moveType = "flyToTarget"
-            self.xSpeed=0
+            self.xSpeed=2
+            self.ySpeed=2
     
-
             self.spriteSheet = SpriteSheet(image_path="assets/ghostSheetCombined2.png",num_actions=2,frames_per_action=7, scale=0.75, animation_cooldown=200) 
             self.image=self.spriteSheet.currImage
         
         if monsterType == "projectile":
             self.moveType = "flyToTarget"
+            self.image = pygame.image.load('assets/omniProjectile.png')
+            self.collision = False
+            self.xSpeed=0#unused
+            self.ySpeed=0#unuesed
+            self.speed_x, self.speed_y = move_towards_target(self.rect.x, self.rect.y, self.targetCoords[0], self.targetCoords[1], 15)
 
         if monsterType == "treasureChest":
             self.spriteSheet = SpriteSheet(image_path="assets/Chests.png", xDim=48, yDim=32, num_actions=8,frames_per_action=5, scale=0.75, animation_cooldown=100) 
             self.spriteSheet.set_action(self.chestType)
             self.xSpeed=0
+            self.ySpeed=0
+            self.collision = False
 
             self.image=self.spriteSheet.currImage
             
@@ -79,11 +116,21 @@ class Monster(pygame.sprite.Sprite):
             self.spriteSheet = SpriteSheet(image_path="assets/Pixel purple gem.png",frames_per_action=7, scale=scale, pause=100) 
             self.image=self.spriteSheet.currImage
             self.xSpeed=0
+            self.ySpeed=0
+            self.collision = False
+
+        if monsterType == "explosion":
+            self.spriteSheet = SpriteSheet(image_path="assets/Retro Impact Effect Pack 1 A.png", xDim=64, yDim=64, num_actions=24, frames_per_action=7, scale=2.0, animation_cooldown=20) 
+            self.spriteSheet.set_action(5)
+            self.xSpeed=0
+            self.ySpeed=0
+            self.collision = False
+
+            self.image=self.spriteSheet.currImage
 
         # TODO: if gem, draw gem, if ghost, draw ghost moving xMoveDirection, if chest ... etc
 
 
-        
         self.rect = self.image.get_rect()
         self.rect.x = self.spawnCoords[0]
         self.rect.y = self.spawnCoords[1]
@@ -100,21 +147,25 @@ class Monster(pygame.sprite.Sprite):
 
 
     def update(self, pressed_keys=None, globalOffset=0):
-        if self.monsterType in ["heavyGhost", "gem", "treasureChest", "lightGhost"]:
+        if self.monsterType in ["heavyGhost", "gem", "treasureChest", "lightGhost", "explosion"]:
             self.spriteSheet.updateSpriteSheet()
             if self.xMoveDirection == 1:
                self.image = pygame.transform.flip(self.spriteSheet.currImage, True, False)
             else:
                 self.image = self.spriteSheet.currImage
+            if self.monsterType=="explosion" and self.spriteSheet.frame==6:
+                super().kill()
+        
         if self.moveType != "flyToTarget":
             self.gravityAccel = min(self.max_speed, self.gravityAccel + self.gravityMult)
             self.change_y +=self.gravityAccel
 
-        if self.xMoveDirection:
-            self.change_x = self.xSpeed * self.xMoveDirection
-        self.rect.x += self.change_x
-        self.yOrigin += self.change_y
-        self.rect.y = self.yOrigin + globalOffset
+            if self.xMoveDirection:
+                self.change_x = self.xSpeed * self.xMoveDirection
+
+            self.rect.x += self.change_x
+            self.yOrigin += self.change_y
+            self.rect.y = self.yOrigin + globalOffset
 
 
         # if self.newOffset != globalOffset:
@@ -129,19 +180,101 @@ class Monster(pygame.sprite.Sprite):
         # and make sure that the player doesn't move into the other sprite by setting
         # the player's position to the side of the other sprite
 
-        # +++++++++++ Drawing++++++++++++++++++
+        # +++++++++collision++++++++++++++++++++
+        if self.monsterType in ["lightGhost", "heavyGhost", "gem", "treasureChest"]:
+            # print(self.monsterType, self, self.playerHandle)
+            if pygame.sprite.collide_rect(self, self.playerHandle):
+                if self.monsterType == "gem":
+                    self.scoreHandle.addScore(100)
+                if self.monsterType == "treasureChest":
+                    choice = random.randint(0,1)
+                    if choice == 1:
+                        self.scoreHandle.addScore(400)
+                    if choice == 0:
+                        self.health_Handle.update_health(self.health_Handle.health+1)
+                if self.monsterType in ["lightGhost", "heavyGhost"]:
+                    self.health_Handle.update_health(self.health_Handle.health-1)
+                super().kill()
 
-
+        #Check projectile against mobs
 
         # ++++++++++ physics+++++++++++++++++
-        if self.monsterType != "projectile":
-            #check collision to player, do damage if mob, award points if loot, play relevant animations
-            pass
+        if self.monsterType in ["projectile", "lightGhost"]:
+            if self.monsterType == "lightGhost":
+                
+                self.targetCoords = (self.playerHandle.rect.x,  self.playerHandle.rect.y)
+                #update speed real time
+                self.speed_x, self.speed_y = move_towards_target(self.rect.x, self.rect.y, self.targetCoords[0], self.targetCoords[1], 2)
+                if self.speed_x>=0:
+                    self.speed_x = min(2,self.speed_x)
+                else:
+                    self.speed_x = max(-2,self.speed_x)
+
+                if self.speed_y>=0:
+                    self.speed_y = min(2,self.speed_y)
+                else:
+                    self.speed_y = max(-2, self.speed_y)
+                self.rect.x += self.speed_x
+                self.yOrigin += self.speed_y
+                self.rect.y = self.yOrigin + globalOffset
+                print(self.rect.x, self.rect.y, self.speed_x, self.speed_y)
+           
+           
+            # if self.rect.x < self.targetCoords[0]:
+            #     self.rect.x += self.xSpeed
+            # else:
+            #     self.rect.x -= self.xSpeed
+            # if self.rect.y < self.targetCoords[1]:
+            #     self.rect.y += self.ySpeed
+            # else:
+            #     self.rect.y -= self.ySpeed
+            else:
+                self.rect.y += self.speed_y
+                self.rect.x += self.speed_x
+
+                # self.yOrigin += self.speed_y
+                # self.rect.y = self.yOrigin + globalOffset
+                # print(self.rect.y, self.yOrigin, globalOffset)
+
+                
+            if self.monsterType == "projectile": #projectile check
+                tile_collide_list = pygame.sprite.spritecollide(self, self.walls, False)
+                sprite_collide_list = pygame.sprite.spritecollide(self, self.allSprites, False)
+
+                collisionPoint=False
+                for collidedTile in tile_collide_list:
+                    collisionPoint = (collidedTile.rect.x, collidedTile.rect.y)
+                    
+                for collidedSprite in sprite_collide_list:
+                    if collidedSprite.collision==True:
+                        collisionPoint = (collidedSprite.rect.x, collidedSprite.rect.y)
+
+            
+                #Got pt of collision, now determine casualties
+                if collisionPoint:
+                    # print(collisionPoint, len(tile_collide_list), len(sprite_collide_list))
+                    newGem = Monster(monsterType="explosion", spawnCoords=(collisionPoint[0],collisionPoint[1]-globalOffset), walls=self.walls, 
+                        allSprites=self.allSprites,scoreHandle=self.scoreHandle, health_Handle=self.health_Handle, playerHandle=self.playerHandle)
+                    self.allSprites.add(newGem)
+                    for localTile in self.walls:
+                        if casualty(localTile.rect, self.rect, self.explosionRadius):
+                            if localTile.gem:
+                                newGem = Monster(monsterType="gem", spawnCoords=(localTile.rect.x,localTile.rect.y-globalOffset), walls=self.walls, 
+                        allSprites=self.allSprites,scoreHandle=self.scoreHandle, health_Handle=self.health_Handle, playerHandle=self.playerHandle)
+                                self.allSprites.add(newGem)
+                            localTile.destroyTile()
+                    for localSprite in self.allSprites:
+                        if localSprite.collision==True and casualty(localSprite.rect, self.rect, self.explosionRadius):
+                            localSprite.kill()
+                    #kill self after all 
+                    super().kill()
+            
         
         # Everything that's not a lightGhost collides with tiles
-        if self.monsterType == "lightGhost": 
-            # update fly target to player pos
-            pass
+        if self.monsterType == "explosion": 
+            self.rect.y=self.yOrigin+globalOffset
+            return
+
         if self.monsterType in ["gem", "treasureChest", "heavyGhost"]:
             # if self.monsterType=="gem":
             #     print(len(self.walls))

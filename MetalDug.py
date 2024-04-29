@@ -138,7 +138,8 @@ def loadGame():
     gameOver = False
     screen = pygame.display.set_mode([800, 1000])
     pygame.display.set_caption('METAL DUG')
-
+    health = PlayerHealth(HEIGHT)
+    playerTank = Tank(50, 50, WIDTH, HEIGHT)
     tile_list = pygame.sprite.Group()
     all_sprite_list = pygame.sprite.Group()
     global wall_list
@@ -159,6 +160,10 @@ def loadGame():
     for monster in firstChunk.enemySpawns:
         # monster.walls = wall_list
         monster.walls=tile_list
+        monster.playerHandle=playerTank
+        monster.scoreHandle=score
+        monster.health_Handle=health
+        monster.allSprites=all_sprite_list
         all_sprite_list.add(monster)
     # Add the surface background image, start the cave background images 
     background_list = pygame.sprite.Group()
@@ -168,7 +173,7 @@ def loadGame():
         background_list.add(newCaveTileRow(screenWidth=WIDTH, screenHeight=HEIGHT, depth=caveTileCount))
         caveTileCount +=1
 
-    playerTank = Tank(50, 50, WIDTH, HEIGHT)
+    
     all_sprite_list.add(playerTank)
 
     # Demo camera init, offsets all items Y values based on playerTank pos 
@@ -180,7 +185,7 @@ def loadGame():
     # wall_list.add(demowalls)
     # all_sprite_list.add(demowalls)
 
-    health = PlayerHealth(HEIGHT)
+    
 
     all_sprite_list.add(health)
 
@@ -227,7 +232,12 @@ while running == True:
                 # wall_list.add(tile)
 
         for monster in newChunk.enemySpawns:
+            # print(monster.monsterType)
+            monster.playerHandle=playerTank
             monster.walls = tile_list
+            monster.scoreHandle=score
+            monster.health_Handle=health
+            monster.allSprites=all_sprite_list
             all_sprite_list.add(monster)
     
     m1Click = False
@@ -243,9 +253,11 @@ while running == True:
             if event.button == 1:  # Left mouse button (m1) click
                 # Check if the mouse click is inside the sprite's rect
                 m1Click = True
+                all_sprite_list.add(Monster(monsterType="projectile", spawnCoords=(playerTank.rect.x,playerTank.rect.y), walls=tile_list, 
+                        allSprites=all_sprite_list, targetCoords=(mouse_x,mouse_y) ,scoreHandle=score, health_Handle=health, playerHandle=playerTank))
             if event.button == 3:  # Right mouse button (m2) click
                 m2Click = True
-                health.update_health(health.health-1)
+                # health.update_health(health.health-1)
             
 
 
@@ -280,14 +292,14 @@ while running == True:
             # Camera bounds
             if (tileInstance.coords[1]-camera_y > 0-TILE_PX_SIZE) and (tileInstance.coords[1]-camera_y < HEIGHT+TILE_PX_SIZE):
                 color = tileInstance.debugColor
-                if tileInstance.rect.collidepoint((mouse_x, mouse_y)) and m1Click:
-                    monsterSpawn, points = tileInstance.destroyTile()
-                    score.addScore(points)
-                    if monsterSpawn:
-                        print(len(tile_list))
-                        newGem = Monster(monsterType="lightGhost", spawnCoords=(tileInstance.coords[0],tileInstance.coords[1]), walls=tile_list)
-                        newGem.update()
-                        all_sprite_list.add(newGem)
+                # if tileInstance.rect.collidepoint((mouse_x, mouse_y)) and m1Click:
+                    # monsterSpawn, points = tileInstance.destroyTile()
+                    # score.addScore(points)
+                    # if monsterSpawn:
+                    #     print(len(tile_list))
+                    #     newGem = Monster(monsterType="gem", spawnCoords=(tileInstance.coords[0],tileInstance.coords[1]), walls=tile_list)
+                    #     newGem.update()
+                    #     all_sprite_list.add(newGem)
                         # Spawn monster
                 # if color:
                     # pygame.draw.rect(screen, color, (tileInstance.coords[0], tileInstance.coords[1]-camera_y, TILE_PX_SIZE, TILE_PX_SIZE))

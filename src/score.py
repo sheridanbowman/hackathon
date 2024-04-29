@@ -4,6 +4,7 @@ import pygame
 from pygame.locals import *
 class ScoreCounter(pygame.sprite.Sprite):
     def __init__(self, xPos:int, yPos:int, initialScore:int=0):
+        self.collision=False
         
         self.score = initialScore # Literal Score Total
         self.delayedScore = initialScore # Delayed Score Display

@@ -9,6 +9,8 @@ class Tank(pygame.sprite.Sprite):
     def __init__(self, x, y, screenWidth, screenHeight):
         super(Tank, self).__init__()
 
+        #for projectile check
+        self.collision=False
         # Main body Sprite
         self.spriteSheet = pygame.image.load('assets/demoTankBaseGreen.png').convert_alpha()
         self.sprites =  [[None for _ in range(2)] for _ in range(2)]
