@@ -19,7 +19,8 @@ TILE_PX_SIZE = 32
 
 clock = pygame.time.Clock()
 pygame.font.init()
-font = pygame.font.Font("assets/m5x7/m5x7.ttf", 36)
+font = pygame.font.Font("assets/PixelEmulator/PixelEmulator.ttf", 36)
+
 
 class Wall(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
@@ -199,6 +200,12 @@ timer = 0
 running = True
 retryRect = None
 
+pygame.mouse.set_visible(False)
+
+cursor_img = pygame.image.load("assets/Crosshair/crosshair.png")
+cursor_surface = pygame.Surface((16,32))
+cursor_img_rect = cursor_img.get_rect()
+
 while running == True:
     mouse_x, mouse_y = pygame.mouse.get_pos()
     # mouse_x = mouse_x / 1.5
@@ -247,6 +254,10 @@ while running == True:
                 m2Click = True
                 health.update_health(health.health-1)
             
+        cursor_img_rect.center = pygame.mouse.get_pos()
+        cursor_surface.blit(cursor_img, (16,32), (0,0,16,64))
+        screen.blit(cursor_img, cursor_img_rect)
+
 
 
     pressed_keys = pygame.key.get_pressed()
