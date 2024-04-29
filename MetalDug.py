@@ -1,13 +1,12 @@
 import pygame
 import math
-#from src.projectile import Projectile
+from pygame.locals import *
 from src.monsters import Monster
 from src.background import BackgroundImage, initCaveBackgroundTileGroup, initSurfaceBackgroundTileGroup
 from src.staticTile import staticTile
 from src.tileChunks import setChunkDims, createProceduralChunk, createCustomChunk
 from src.score import ScoreCounter
 from src.tank import Tank
-from pygame.locals import *
 
 
 # Constants for display. Make sure dims are divisible by tile px size!
@@ -138,6 +137,7 @@ while running == True:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 playerTank.shoot_projectile()
+                
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Check if the mouse click is inside the sprite's rect

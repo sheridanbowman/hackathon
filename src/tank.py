@@ -1,10 +1,7 @@
 import pygame
 from pygame.locals import *
-from projectile import Projectile
-from monsters import Monster
-from tank import wall_list
-from tank import get_pos
-from tank import all_sprite_list
+from src.projectile import Projectile
+import math
 
 
 class Tank(pygame.sprite.Sprite):
@@ -104,12 +101,20 @@ class Tank(pygame.sprite.Sprite):
         # print(self.jumpDuration)
         
     def shoot_projectile(self):
-        mouse_x,mouse_y = pygame.mouse,get_pos()
-        direction = (mouse_x - self.rect.centerx, mouse_y - self.rect.centery)
-        projectile = Projectile(self.rect.center, wall_list, direction)
-        all_sprite_list.add(projectile)
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        turret_x, turret_y = self.get_turret_position()  # Get the position of the tank's turret
+        direction = (mouse_x - turret_x, mouse_y - turret_y)  # Calculate direction vector
+        
+        # Calculate the angle between the turret and the mouse
+        angle = math.atan2(mouse_y - self.rect.y, mouse_x - (self.rect.x+16))
+        
+        # Pass the angle as the direction to the projectile
+        projectile = Projectile((turret_x, turret_y), direction, angle)
+        
 
-        collide_list = pygame.sprite.spritecollide(self, self.walls, False)
+        # Utilize inherited collision handling
+        projectile.handle_collision()
+
         # collide list is a list of all of the sprites that the player is 
         # currently in contact with. If they are currently touching something,
         # the following code will check if the player is moving left or right
@@ -123,7 +128,7 @@ class Tank(pygame.sprite.Sprite):
         
         # does the same as above, but with up and down
         # collide_list = pygame.sprite.spritecollide(self, self.walls, False)
-        for wall in collide_list:
+        '''for wall in collide_list:
 
             if self.rect.right >= wall.rect.left and self.rect.left <= wall.rect.left:
                 self.rect.right = wall.rect.left
@@ -147,7 +152,7 @@ class Tank(pygame.sprite.Sprite):
             # print(self.rect.bottom, wall.rect.top, self.rect.bottom>wall.rect.top)
             # Collision below?
         
-
+'''
         """movepanels = self.rightpanels
         mainpanel = movepanels[1]
 
