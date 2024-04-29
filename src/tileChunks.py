@@ -141,6 +141,8 @@ def assignMonsters(tileArray):
                 monsters.append(Monster(monsterType="treasureChest", spawnCoords=localTile.coords))
             if localTile.enemySpawn:
                 monsters.append(Monster(monsterType=localTile.enemySpawn, spawnCoords=localTile.coords))
+            if localTile.enemySpawn:
+                monsters.append(Monster(monsterType=localTile.enemySpawn, spawnCoords=localTile.coords))
     return monsters
 
 # Initialize custom chunk

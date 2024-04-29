@@ -38,6 +38,10 @@ CHUNK_HEIGHT, CHUNK_WIDTH = setChunkDims(WIDTH, HEIGHT, TILE_PX_SIZE)
 screen = pygame.display.set_mode([800, 1000])
 pygame.display.set_caption('METAL DUG')
 
+
+fireTimer = 0
+fireLimit = 100
+
 def retryState(countdown):
     # Get the text surface
     text_surface = font.render("CONTINUE?", True, (255, 255, 255))
@@ -205,6 +209,8 @@ running = True
 retryRect = None
 
 while running == True:
+    fireTimer += 1
+    
     mouse_x, mouse_y = pygame.mouse.get_pos()
     # mouse_x = mouse_x / 1.5
     # mouse_y = mouse_y / 1.5
