@@ -9,6 +9,7 @@ from src.score import ScoreCounter
 from src.tank import Tank
 from pygame.locals import *
 
+
 # Constants for display. Make sure dims are divisible by tile px size!
 WIDTH = 800
 HEIGHT = 1000
@@ -133,6 +134,10 @@ while running == True:
         elif event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                 running = False
+        
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                playerTank.shoot_projectile()
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Check if the mouse click is inside the sprite's rect
@@ -167,7 +172,7 @@ while running == True:
             if (tileInstance.coords[1]-camera_y > 0-TILE_PX_SIZE) and (tileInstance.coords[1]-camera_y < HEIGHT+TILE_PX_SIZE):
                 color = tileInstance.debugColor
                 if tileInstance.rect.collidepoint((mouse_x, mouse_y))and m1Click:
-                    monsterSpawn, points = tileInstance.destroyTile()
+                    monsterSpawn, points, spawnCoords = tileInstance.destroyTile()
                     score.addScore(points)
                     if monsterSpawn:
                         all_sprite_list.add(Monster(monsterType="gem", spawnCoords=tileInstance.coords, walls=wall_list))
@@ -185,11 +190,11 @@ while running == True:
     #     Collisions.check_projectile_collision(projectile, enemy_list)
     #     #need to add enemy list
     
-    for event in pygame.event.get():
+    #for event in pygame.event.get():
     # Existing code...
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:  # Left mouse button
-                playerTank.shoot_projectile()
+    #    if event.type == pygame.MOUSEBUTTONDOWN:
+    #        if event.button == 1:  # Left mouse button
+    #           playerTank.shoot_projectile()
                 
 
 
