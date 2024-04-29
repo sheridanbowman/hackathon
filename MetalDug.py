@@ -315,6 +315,10 @@ while running == True:
     #     #need to add enemy list
     
     
+
+
+
+
     all_sprite_list.draw(screen)
 
 
