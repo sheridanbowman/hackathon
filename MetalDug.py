@@ -254,7 +254,7 @@ while running == True:
             if not (tile.backgroundEmpty or tile.empty):
                 tile_list.add(tile)
                 # wall_list.add(tile)
-
+        # print("spawning monsters!")
         for monster in newChunk.enemySpawns:
             # print(monster.monsterType)
             monster.playerHandle=playerTank

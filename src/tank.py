@@ -22,6 +22,8 @@ class Tank(pygame.sprite.Sprite):
 
         self.image = self.sprites[0][0]
 
+        self.explosionRadiusHandle=60
+
         self.rect = self.image.get_rect()
         # Create a smaller rect centered within the larger rect
         small_rect = pygame.Rect((0, 0), (30, 30))

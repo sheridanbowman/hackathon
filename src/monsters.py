@@ -82,7 +82,7 @@ class Monster(pygame.sprite.Sprite):
         if monsterType == "heavyGhost":
             self.debugColor = (255, 0, 0)
             self.moveType = "walk"
-            self.xSpeed=2
+            self.xSpeed=random.randint(1,3)
             self.ySpeed=0
                 
             self.spriteSheet = SpriteSheet(image_path="assets/ghostSheetCombined.png",num_actions=2,frames_per_action=7, scale=0.75, animation_cooldown=200) 
@@ -227,7 +227,8 @@ class Monster(pygame.sprite.Sprite):
                 else:
                     self.speed_y = max(-2, self.speed_y)
                 self.rect.x += self.speed_x
-                self.yOrigin += self.speed_y
+                if self.rect.y < 1000:
+                    self.yOrigin += self.speed_y
                 self.rect.y = self.yOrigin + globalOffset
                 # print(self.rect.x, self.rect.y, self.speed_x, self.speed_y)
            

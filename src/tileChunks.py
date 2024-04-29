@@ -49,24 +49,24 @@ def createProceduralChunk(depth:int=0, addCavernsLater=False):
     newChunk = tileChunk(depth)
     unsortedTiles = []
         
-    ghostEnemySpawnRate = depth*3.0
+    ghostEnemySpawnRate = depth*2
     for _ in range(int(ghostEnemySpawnRate)):
         unsortedTiles.append(staticTile(enemySpawn="lightGhost"))
 
     # flags creation of a small cavern, with just an enemy
-    defaultEnemyCavernRate = (1+depth)*3.0 
+    defaultEnemyCavernRate = (1+depth)*2
     for _ in range(int(defaultEnemyCavernRate)):
         unsortedTiles.append(staticTile(enemySpawn="heavyGhost"))
 
     # flags creation of a small cavern, with an enemy + treasure
-    treasureCavernRate = (1+depth)*3.0
+    treasureCavernRate = (1+depth)*2
     for _ in range(int(treasureCavernRate)):
         unsortedTiles.append(staticTile(treasure=True))
 
     remainingTiles = totalTiles - (treasureCavernRate + defaultEnemyCavernRate + ghostEnemySpawnRate)
     
     # Gems default to 33% remainder, scales by depth 10 becomes 100% remainder
-    gemTiles = int((0.15 * remainingTiles) + (depth * 0.85))
+    gemTiles = int((0.10 * remainingTiles) + (depth * 0.5))
     for _ in range(gemTiles):
         unsortedTiles.append(staticTile(gem=True))
 
@@ -139,8 +139,6 @@ def assignMonsters(tileArray):
         for localTile in row:
             if localTile.treasure:
                 monsters.append(Monster(monsterType="treasureChest", spawnCoords=localTile.coords))
-            if localTile.enemySpawn:
-                monsters.append(Monster(monsterType=localTile.enemySpawn, spawnCoords=localTile.coords))
             if localTile.enemySpawn:
                 monsters.append(Monster(monsterType=localTile.enemySpawn, spawnCoords=localTile.coords))
     return monsters
