@@ -101,29 +101,71 @@ class Monster(pygame.sprite.Sprite):
         else: # Has wall collision
             collide_list = pygame.sprite.spritecollide(self, self.walls, False)
             for wall in collide_list:
-                if self.rect.right >= wall.rect.left and self.rect.left <= wall.rect.left:
-                    # print(self.change_x)
-                    self.rect.right = wall.rect.left
-                    if self.moveType == "walking": #walkers change direction
-                        self.xMoveDirection = -1
-                    # print("Collision betwen sprite and the left side", self.change_x, self.rect.right, wall.rect.left)
-                elif self.rect.left <= wall.rect.right and self.rect.right >= wall.rect.right:
-                    # print(self.change_x, self.rect.left, wall.rect.right)
-                    self.rect.left = wall.rect.right
-                    if self.moveType == "walking": #walkers change direction
-                        self.xMoveDirection = 1
-                        # print(self.change_x, self.rect.left, wall.rect.right)
-                    # print("Collision betwen sprite and the right side", self.change_x)
-                elif self.rect.bottom >= wall.rect.top and self.rect.top <= wall.rect.top:
-                    # print("Collision betwen sprite and the top side")
+                if abs(wall.rect.left - self.rect.right) >5 and wall.rect.right - self.rect.left >5:
+                    # Check for collision with the top side of the wall
+                    if self.rect.bottom >= wall.rect.top and self.rect.top < wall.rect.top:
+                        if self.change_y > 0.0:  # Moving upward
+                            # print("botcollide")
+                            self.rect.bottom = wall.rect.top
+                        # Reset jump
+                        self.jumpDuration = 0
+                        self.change_y = 0
+                        self.gravityAccel = 0
 
-                    self.change_y = 0
-                    self.gravityAccel = 0
-                    self.rect.bottom = wall.rect.top
-                # elif self.rect.top <= wall.rect.bottom and self.rect.bottom >= wall.rect.bottom:
-                #     print("Collision betwen sprite and the bottom side")    
-            # if self.monsterType == "projectile":
-            #     # Also has enemy sprite collision
-            #     # spawn explosion at coord
-            #     # enemy_collide_list = pygame.sprite.spritecollide(self, self.enemies, False)
-            #     pass
+                    # Check for collision with the bottom side of the wall
+                    elif self.rect.top <= wall.rect.bottom and self.rect.bottom > wall.rect.bottom:
+                        # print("sprite collides with bottom ", self.rect.top, wall.rect.bottom)
+                        if self.change_y < 0.0:  # Moving upward
+                            self.rect.top = wall.rect.bottom
+                            self.change_y = 0
+                            print(self.rect.bottom , wall.rect.top)
+
+            self.rect.x += self.change_x
+            for wall in collide_list:
+                # Check for collision with the right side of the wall
+                if wall.rect.top < self.rect.bottom and wall.rect.bottom > self.rect.top:
+                    if self.rect.left <= wall.rect.right and self.rect.right > wall.rect.right:
+                        # print("sprite collides with right of block",self.rect.left, self.rect.right, wall.rect.left, wall.rect.right, self.change_x)
+                        if self.change_x < 0:  # Moving left
+                            self.rect.left = wall.rect.right
+                            self.change_x = 0
+
+                        # if self.change_x < 0:  # Moving left
+                            
+
+                    # Check for collision with the left side of the wall
+                    elif self.rect.right >= wall.rect.left and self.rect.left < wall.rect.left:
+                        # print("sprite collides with left of block")
+                        if self.change_x > 0:  # Moving left
+                            self.rect.right = wall.rect.left
+                            self.change_x = 0
+            
+
+            # collide_list = pygame.sprite.spritecollide(self, self.walls, False)
+            # for wall in collide_list:
+            #     if self.rect.right >= wall.rect.left and self.rect.left <= wall.rect.left:
+            #         # print(self.change_x)
+            #         self.rect.right = wall.rect.left
+            #         if self.moveType == "walking": #walkers change direction
+            #             self.xMoveDirection = -1
+            #         # print("Collision betwen sprite and the left side", self.change_x, self.rect.right, wall.rect.left)
+            #     elif self.rect.left <= wall.rect.right and self.rect.right >= wall.rect.right:
+            #         # print(self.change_x, self.rect.left, wall.rect.right)
+            #         self.rect.left = wall.rect.right
+            #         if self.moveType == "walking": #walkers change direction
+            #             self.xMoveDirection = 1
+            #             # print(self.change_x, self.rect.left, wall.rect.right)
+            #         # print("Collision betwen sprite and the right side", self.change_x)
+            #     elif self.rect.bottom >= wall.rect.top and self.rect.top <= wall.rect.top:
+            #         # print("Collision betwen sprite and the top side")
+
+            #         self.change_y = 0
+            #         self.gravityAccel = 0
+            #         self.rect.bottom = wall.rect.top
+            #     # elif self.rect.top <= wall.rect.bottom and self.rect.bottom >= wall.rect.bottom:
+            #     #     print("Collision betwen sprite and the bottom side")    
+            # # if self.monsterType == "projectile":
+            # #     # Also has enemy sprite collision
+            # #     # spawn explosion at coord
+            # #     # enemy_collide_list = pygame.sprite.spritecollide(self, self.enemies, False)
+            # #     pass

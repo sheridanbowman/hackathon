@@ -10,7 +10,14 @@
 
                                                                                                                 score counter increment faster based on different
 
-                                                                                                        
+
+fix screen jitter 
+
+firing sound
+explosion
+power up sound for chest
+coin pickup sound
+
 Swap to arcade NES font
 
 sounds
