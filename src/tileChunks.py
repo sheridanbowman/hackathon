@@ -66,7 +66,7 @@ def createProceduralChunk(depth:int=0, addCavernsLater=False):
     remainingTiles = totalTiles - (treasureCavernRate + defaultEnemyCavernRate + ghostEnemySpawnRate)
     
     # Gems default to 33% remainder, scales by depth 10 becomes 100% remainder
-    gemTiles = int((0.33 * remainingTiles) + (depth * 0.066))
+    gemTiles = int((0.15 * remainingTiles) + (depth * 0.85))
     for _ in range(gemTiles):
         unsortedTiles.append(staticTile(gem=True))
 
@@ -152,7 +152,8 @@ def createCustomChunk(depth:int=0, customArray=False):
         chunk.tilesArray = customArray
     else:
         # Fill the first 1/4 with empty space, then a row of grass
-        startSpace = int(tilesPerChunkHeight*0.25)
+        # startSpace = int(tilesPerChunkHeight*0.25)
+        startSpace = 8
         yPos = depth * tilesPerChunkHeight * tilesSize
         for rowIndex in range(startSpace+1):
             row = chunk.tilesArray[rowIndex]

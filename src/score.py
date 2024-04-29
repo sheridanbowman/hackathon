@@ -21,7 +21,7 @@ class ScoreCounter(pygame.sprite.Sprite):
         if self.score > self.delayedScore:
             if self.timer > self.delay:
                 self.timer = 0
-                self.delayedScore += 1
+                self.delayedScore += max(1, int((self.score - self.delayedScore)/5))
             else:
                 self.timer +=1
 
@@ -30,11 +30,10 @@ class ScoreCounter(pygame.sprite.Sprite):
         # self.y = self.y + yOffset
 
     def addScore(self, newScore):
-        print(self.score, self.timer, self.delayedScore)
         self.score += newScore
 
-    def getShake(self):
-        difference = self.score - self.delayedScore
-        xShake = random.randint((-difference//5), difference//5)
-        yShake = random.randint((-difference//5), difference//5)
-        return xShake, yShake
+    # def getShake(self):
+    #     difference = self.score - self.delayedScore
+    #     xShake = random.randint((-difference//5), difference//5)
+    #     yShake = random.randint((-difference//5), difference//5)
+    #     return xShake, yShake
