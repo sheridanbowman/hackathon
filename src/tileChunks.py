@@ -66,7 +66,7 @@ def createProceduralChunk(depth:int=0, addCavernsLater=False):
     remainingTiles = totalTiles - (treasureCavernRate + defaultEnemyCavernRate + ghostEnemySpawnRate)
     
     # Gems default to 33% remainder, scales by depth 10 becomes 100% remainder
-    gemTiles = int((0.33 * remainingTiles) + (depth * 0.066))
+    gemTiles = int((0.15 * remainingTiles) + (depth * 0.85))
     for _ in range(gemTiles):
         unsortedTiles.append(staticTile(gem=True))
 

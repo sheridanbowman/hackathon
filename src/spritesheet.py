@@ -54,7 +54,7 @@ class SpriteSheet:
     #     self.animation_list = [
     #         self.get_image(i) for i in range(self.animation_steps)
     #     ]
-    def __init__(self, image_path, num_actions, frames_per_action, animation_cooldown=100, xDim=32, yDim=32, numFrames=2, current_action=0):
+    def __init__(self, image_path, frames_per_action, num_actions=1, paused=False, scale=1.0, pause=0, animation_cooldown=100, xDim=32, yDim=32, current_action=0):
         self.sheet = pygame.image.load(image_path).convert_alpha()
         self.num_actions = num_actions
         self.frames_per_action = frames_per_action
@@ -71,8 +71,17 @@ class SpriteSheet:
         # Current frame
         self.frame = 0
 
+        # if to have animation paused, to resume later (chest)
+        self.paused = paused
+
+        # pause between loops
+        self.pause = pause
+        self.pauseTimer = 0
+        self.scale = scale
         # Fill self.actions with frames
-        self.load_images(xDim, yDim, numFrames)   
+        self.load_images(width=xDim, height=yDim, scale=scale)   
+
+        self.currImage = self.actions[self.current_action][self.frame]
 
     
 
@@ -96,11 +105,22 @@ class SpriteSheet:
 
     def updateSpriteSheet(self):
         current_time = pygame.time.get_ticks()
-        if current_time - self.last_update >= self.animation_cooldown:
-            self.frame += 1
-            self.last_update = current_time
-            if self.frame >= len(self.actions[self.current_action]):
-                self.frame = 0
+        # print(self.frame, self.pauseTimer, self.pause)
+        if self.frame == 0 and self.pause != 0 and self.pauseTimer < self.pause:
+            # Increment the pause timer
+            self.pauseTimer += 1
+        else:
+            if current_time - self.last_update >= self.animation_cooldown:
+                self.frame += 1
+                self.last_update = current_time
+                if self.frame >= len(self.actions[self.current_action]):
+                    self.frame = 0
+            self.currImage = self.actions[self.current_action][self.frame]
+            # Reset the pause timer if not in pause state
+            self.pauseTimer = 0
+        
+        
+
 
     # Swap to action X
     def set_action(self, action_index):
@@ -111,39 +131,39 @@ class SpriteSheet:
             exit("Tried loading row", action_index, "out of", self.num_actions)
         
 
-    def draw(self, screen):
-        # screen.blit(self.animation_list[self.frame], (x, y))
-        screen.blit(self.actions[self.current_action][self.frame], (SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
+    # def draw(self, screen):
+    #     # screen.blit(self.animation_list[self.frame], (x, y))
+    #     screen.blit(self.actions[self.current_action][self.frame], (SCREEN_WIDTH//2, SCREEN_HEIGHT//2))
 
 
-# Usage example:
-pygame.init()
-SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption('Sprite Animation')
-clock = pygame.time.Clock()
+# # Usage example:
+# pygame.init()
+# SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
+# screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+# pygame.display.set_caption('Sprite Animation')
+# clock = pygame.time.Clock()
 
-#Insert png for sprite
-sprite_sheet = SpriteSheet('assets/ghostSheetCombined.png', 2, 8)
+# #Insert png for sprite
+# sprite_sheet = SpriteSheet('assets/ghostSheetCombined.png', 2, 8)
 
-running = True
-action_cycle = 0
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+# running = True
+# action_cycle = 0
+# while running:
+#     for event in pygame.event.get():
+#         if event.type == pygame.QUIT:
+#             running = False
 
-    sprite_sheet.update()
+#     sprite_sheet.update()
 
-    # Example: Cycle through actions
-    if pygame.time.get_ticks() % 2000 < 50:
-        action_cycle = (action_cycle + 1) % 4
-        sprite_sheet.set_action(action_cycle)
+#     # Example: Cycle through actions
+#     if pygame.time.get_ticks() % 2000 < 50:
+#         action_cycle = (action_cycle + 1) % 4
+#         sprite_sheet.set_action(action_cycle)
 
-    screen.fill(BLACK)
-    sprite_sheet.draw(screen)
-    pygame.display.flip()
-    clock.tick(60)
+#     screen.fill(BLACK)
+#     sprite_sheet.draw(screen)
+#     pygame.display.flip()
+#     clock.tick(60)
 
 # # Insert sprite file, with each row, and their frames
 # sprite_sheet_image_path = 'assets/Animated Chests/Chests.png'

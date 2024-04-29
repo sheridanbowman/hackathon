@@ -141,6 +141,7 @@ def loadGame():
 
     tile_list = pygame.sprite.Group()
     all_sprite_list = pygame.sprite.Group()
+    global wall_list
     wall_list = pygame.sprite.Group()
     score = ScoreCounter(xPos=0,yPos=0,initialScore=0)
     # Load first chunk
@@ -175,9 +176,9 @@ def loadGame():
     camLowerBound = HEIGHT // 2
     globalOffset = 0
 
-    demowalls = [Wall(0, 300, 3000, 20), Wall(0, 900, 3000, 20), Wall(WIDTH-50, 0, 20, 3000), Wall(30, 0, 20, 3000)]
-    wall_list.add(demowalls)
-    all_sprite_list.add(demowalls)
+    # demowalls = [Wall(0, 300, 3000, 20), Wall(0, 900, 3000, 20), Wall(WIDTH-50, 0, 20, 3000), Wall(30, 0, 20, 3000)]
+    # wall_list.add(demowalls)
+    # all_sprite_list.add(demowalls)
 
     health = PlayerHealth(HEIGHT)
 
@@ -187,7 +188,7 @@ def loadGame():
     playerTank.walls = tile_list
 
     countdown=10
-
+    print(len(wall_list))
     return countdown, gameOver, playerTank, screen, tile_list, all_sprite_list, wall_list, background_list, chunkList, caveTileCount, health, score, camera_x, camera_y, camLowerBound, globalOffset
 
 
@@ -222,13 +223,13 @@ while running == True:
         chunkList.append(newChunk)
         for tile in newChunk.getTiles():
             if not (tile.backgroundEmpty or tile.empty):
-                # tile_list.add(tile)
-                wall_list.add(tile)
+                tile_list.add(tile)
+                # wall_list.add(tile)
 
         for monster in newChunk.enemySpawns:
-            monster.walls = wall_list
+            monster.walls = tile_list
             all_sprite_list.add(monster)
-        
+    
     m1Click = False
     m2Click = False
     for event in pygame.event.get():
@@ -251,7 +252,7 @@ while running == True:
     pressed_keys = pygame.key.get_pressed()
     
     if not gameOver:
-        all_sprite_list.update(pressed_keys)
+        all_sprite_list.update(pressed_keys=pressed_keys, globalOffset=globalOffset)
         playerTank.update(pressed_keys)
 
     # Update camera offset to follow the playerTank
@@ -272,7 +273,7 @@ while running == True:
     #have to either keep collisions for all tiles forever
     #or kill enemies off screen; or they'll drop to top of current chunk
     #and clip through 
-        
+    
     monsterSpawn = False
     for chunk in chunkList:
         for tileInstance in chunk.getTiles():
@@ -283,7 +284,10 @@ while running == True:
                     monsterSpawn, points = tileInstance.destroyTile()
                     score.addScore(points)
                     if monsterSpawn:
-                        all_sprite_list.add(Monster(monsterType="gem", spawnCoords=tileInstance.coords, walls=wall_list))
+                        print(len(tile_list))
+                        newGem = Monster(monsterType="lightGhost", spawnCoords=(tileInstance.coords[0],tileInstance.coords[1]), walls=tile_list)
+                        newGem.update()
+                        all_sprite_list.add(newGem)
                         # Spawn monster
                 # if color:
                     # pygame.draw.rect(screen, color, (tileInstance.coords[0], tileInstance.coords[1]-camera_y, TILE_PX_SIZE, TILE_PX_SIZE))

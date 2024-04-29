@@ -21,7 +21,7 @@ class staticTile(pygame.sprite.Sprite):
     
         self.debugColor = None
         self.collision = False
-        self.image = pygame.Surface((36, 36))
+        self.image = pygame.Surface((36, 36), pygame.SRCALPHA)
 
         spriteSheet = pygame.image.load('assets/dirtTilesOverdraw.png').convert_alpha()
         self.sprites = []
@@ -30,6 +30,7 @@ class staticTile(pygame.sprite.Sprite):
 
         if enemySpawn == "lightGhost":
             self.debugColor = (192, 192, 192)
+            self.image = self.sprites[random.randint(1,2)]
         if enemySpawn == "heavyGhost":
             self.debugColor = (255, 0, 0)
         if default:
@@ -43,14 +44,14 @@ class staticTile(pygame.sprite.Sprite):
             self.debugColor = (255, 0, 255)
             self.image = self.sprites[random.randint(3,4)]
         if empty:
-            self.debugColor = (0, 0, 0)
+            self.debugColor = (0, 0, 0, 0)
         if grass:
             self.collision = True
             self.debugColor = (0, 255, 0)
             self.image = self.sprites[0]
         if boundary:
             self.collision = True
-            self.debugColor = (0, 0, 0)
+            self.debugColor = (0, 0, 0, 0)
         if backgroundEmpty:
             self.debugColor = False
 
@@ -74,6 +75,7 @@ class staticTile(pygame.sprite.Sprite):
     # Handles logic for destroying a tile
     # Returns points to add, 'monster' type to spawn, and coordinates to spawn it
     def destroyTile(self):
+        # print(self.debugColor)
         monsterSpawn = False
         points = 0
         if self.gem:  

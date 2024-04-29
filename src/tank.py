@@ -63,7 +63,7 @@ class Tank(pygame.sprite.Sprite):
         self.jumpDuration = 0
 
         # Limit for how long to apply Jump Speed Displacement
-        self.jumpLimit = 15
+        self.jumpLimit = 20
         self.jumpSpeed = 2
             
         # TODO: increase jump height as multiple of current speed
@@ -79,7 +79,7 @@ class Tank(pygame.sprite.Sprite):
         if y_diff != 0:
             self.change_y = y_diff
 
-    def update(self, pressed_keys):
+    def update(self, pressed_keys, globalOffset=0):
         # Player position
         not_moving = True
         
@@ -142,98 +142,16 @@ class Tank(pygame.sprite.Sprite):
         
 
         collide_list = pygame.sprite.spritecollide(self, self.walls, False)
-        # collide list is a list of all of the sprites that the player is 
-        # currently in contact with. If they are currently touching something,
-        # the following code will check if the player is moving left or right
-        # and make sure that the player doesn't move into the other sprite by setting
-        # the player's position to the side of the other sprite
-        # for wall in collide_list:
-        #     if self.change_x > 0:
-        #         self.rect.right = wall.rect.left
-        #     else:
-        #         self.rect.left = wall.rect.right
-        
-        # does the same as above, but with up and down
-        # collide_list = pygame.sprite.spritecollide(self, self.walls, False)
-        # if not debugMode:
-        #     for wall in collide_list:
-        #         if self.rect.bottom >= wall.rect.top and self.rect.top >= wall.rect.top:
-        #             # print("Collision betwen sprite and the top side")
-        #             # if self.change_y > 0:
-        #             # Reset jump
-        #             self.jumpDuration = 0
-
-        #             self.change_y = 0
-        #             self.gravityAccel = 0
-        #             self.rect.bottom = wall.rect.top
-        #         elif self.rect.right >= wall.rect.left and self.rect.left <= wall.rect.left:
-        #             self.rect.right = wall.rect.left
-        #             self.change_x = 0
-        #             print("Collision betwen sprite and the left side")
-        #         elif self.rect.left <= wall.rect.right and self.rect.right >= wall.rect.right:
-        #             self.rect.left = wall.rect.right
-        #             self.change_x = 0
-        #             print("Collision betwen sprite and the right side")
-        #         elif self.rect.top <= wall.rect.bottom and self.rect.bottom >= wall.rect.bottom:
-        #             # print("Collision betwen sprite and the bottom side")
-        #             self.rect.top = wall.rect.bottom
-        #             self.change_y = 0
-            
-        #     # print(self.rect.bottom, wall.rect.top, self.rect.bottom>wall.rect.top)
-        #     # Collision below?
-
-        # self.rect.x += self.change_x
-        # self.rect.y += max(-9, min(9, self.change_y))
-        # if not debugMode:
-        #     for wall in collide_list:
-        #         # Check for collision with the top side of the wall
-        #         if self.rect.bottom >= wall.rect.top and self.rect.top < wall.rect.top:
-        #             if self.change_y > 0.0:  # Moving upward
-        #                 print("botcollide")
-        #                 self.rect.bottom = wall.rect.top
-        #             # Reset jump
-        #             self.jumpDuration = 0
-        #             self.change_y = 0
-        #             self.gravityAccel = 0
-
-        #          # Check for collision with the bottom side of the wall
-        #         elif self.rect.top <= wall.rect.bottom and self.rect.bottom > wall.rect.bottom:
-        #             print("sprite collides with bottom ", self.rect.top, wall.rect.bottom)
-        #             if self.change_y < 0.0:  # Moving upward
-        #                 self.rect.top = wall.rect.bottom
-        #                 self.change_y = 0
-        #                 print(self.rect.bottom , wall.rect.top)
-
-
-
-        #         # Check for collision with the right side of the wall
-        #         elif self.rect.left <= wall.rect.right and self.rect.right > wall.rect.right:
-        #             print("sprite collides with right of block", 
-        #                   self.rect.left, self.rect.right, wall.rect.left, wall.rect.right, self.change_x)
-        #             if self.change_x < 0:  # Moving left
-        #                 self.rect.left = wall.rect.right
-        #                 self.change_x = (self.change_x*-1)//2
-
-        #             # if self.change_x < 0:  # Moving left
-                        
-
-        #         # Check for collision with the left side of the wall
-        #         elif self.rect.right >= wall.rect.left and self.rect.left < wall.rect.left:
-        #             print("sprite collides with left of block")
-        #             if self.change_x > 0:  # Moving left
-        #                 self.rect.right = wall.rect.left
-        #                 self.change_x = (self.change_x*-1)//2
-
-        
+ 
         self.rect.y += max(-9, min(9, self.change_y))
         if not debugMode:
             for wall in collide_list:
                 if abs(wall.rect.left - self.rect.right) >5 and wall.rect.right - self.rect.left >5:
                     # Check for collision with the top side of the wall
                     if self.rect.bottom >= wall.rect.top and self.rect.top < wall.rect.top:
-                        if self.change_y > 0.0:  # Moving upward
+                        # if self.change_y > 0.0:  # Moving upward
                             # print("botcollide")
-                            self.rect.bottom = wall.rect.top
+                        self.rect.bottom = wall.rect.top
                         # Reset jump
                         self.jumpDuration = 0
                         self.change_y = 0
@@ -245,7 +163,7 @@ class Tank(pygame.sprite.Sprite):
                         if self.change_y < 0.0:  # Moving upward
                             self.rect.top = wall.rect.bottom
                             self.change_y = 0
-                            print(self.rect.bottom , wall.rect.top)
+                            # print(self.rect.bottom , wall.rect.top)
 
             self.rect.x += self.change_x
             for wall in collide_list:
