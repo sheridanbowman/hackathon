@@ -8,6 +8,14 @@ from src.score import ScoreCounter
 import math
 import random
 
+
+pygame.mixer.init()
+explosionSound = pygame.mixer.Sound('assets/laser gun.wav')
+coinSound =pygame.mixer.Sound('assets/Pickup Coin.wav')
+explosion =pygame.mixer.Sound('assets/explosion_echo_29.wav')
+damage = pygame.mixer.Sound('assets/damage.wav')
+# upgrade =pygame.mixer.Sound('assets/upgrade.wav')
+
 # Class for 'monster' type objects that can be spawned; and have collision options: includes gems and chests
 
 # monsterType: type of monster, ["heavyGhost", "treasureChest", "lightGhost", "gem"]
@@ -185,15 +193,19 @@ class Monster(pygame.sprite.Sprite):
             # print(self.monsterType, self, self.playerHandle)
             if pygame.sprite.collide_rect(self, self.playerHandle):
                 if self.monsterType == "gem":
+                    coinSound.play()
                     self.scoreHandle.addScore(100)
                 if self.monsterType == "treasureChest":
+                    coinSound.play()
                     choice = random.randint(0,1)
                     if choice == 1:
                         self.scoreHandle.addScore(400)
                     if choice == 0:
                         self.health_Handle.update_health(self.health_Handle.health+1)
                 if self.monsterType in ["lightGhost", "heavyGhost"]:
+                    damage.play()
                     self.health_Handle.update_health(self.health_Handle.health-1)
+
                 super().kill()
 
         #Check projectile against mobs
@@ -217,7 +229,7 @@ class Monster(pygame.sprite.Sprite):
                 self.rect.x += self.speed_x
                 self.yOrigin += self.speed_y
                 self.rect.y = self.yOrigin + globalOffset
-                print(self.rect.x, self.rect.y, self.speed_x, self.speed_y)
+                # print(self.rect.x, self.rect.y, self.speed_x, self.speed_y)
            
            
             # if self.rect.x < self.targetCoords[0]:
@@ -253,6 +265,7 @@ class Monster(pygame.sprite.Sprite):
                 #Got pt of collision, now determine casualties
                 if collisionPoint:
                     # print(collisionPoint, len(tile_collide_list), len(sprite_collide_list))
+                    explosion.play()
                     newGem = Monster(monsterType="explosion", spawnCoords=(collisionPoint[0],collisionPoint[1]-globalOffset), walls=self.walls, 
                         allSprites=self.allSprites,scoreHandle=self.scoreHandle, health_Handle=self.health_Handle, playerHandle=self.playerHandle)
                     self.allSprites.add(newGem)
