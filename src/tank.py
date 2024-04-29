@@ -1,5 +1,10 @@
 import pygame
 from pygame.locals import *
+from projectile import Projectile
+from monsters import Monster
+from tank import wall_list
+from tank import get_pos
+from tank import all_sprite_list
 
 
 class Tank(pygame.sprite.Sprite):
@@ -98,6 +103,11 @@ class Tank(pygame.sprite.Sprite):
         # self.rect.y +=1
         # print(self.jumpDuration)
         
+    def shoot_projectile(self):
+        mouse_x,mouse_y = pygame.mouse,get_pos()
+        direction = (mouse_x - self.rect.centerx, mouse_y - self.rect.centery)
+        projectile = Projectile(self.rect.center, wall_list, direction)
+        all_sprite_list.add(projectile)
 
         collide_list = pygame.sprite.spritecollide(self, self.walls, False)
         # collide list is a list of all of the sprites that the player is 
