@@ -6,7 +6,7 @@ class PlayerHealth(pygame.sprite.Sprite):
         self.collision=False
         self.health = startHealth
         self.full_health_icon = pygame.image.load('assets/fullHealthIcon.png').convert_alpha()
-        self.empty_health_icon = pygame.image.load('assets/gradientDemo.png').convert_alpha()
+        self.empty_health_icon = pygame.image.load('assets/emptyHealthIcon.png').convert_alpha()
         self.health_icons = []
         for _ in range(self.health):
             self.health_icons.append(self.full_health_icon)

@@ -19,7 +19,14 @@ TILE_PX_SIZE = 32
 
 clock = pygame.time.Clock()
 pygame.font.init()
-font = pygame.font.Font("assets/PixelEmulator/PixelEmulator.ttf", 36)
+font = pygame.font.Font("assets/PixelEmulator/PixelEmulator.ttf", 20)
+font2 = pygame.font.Font("assets/PixelEmulator/PixelEmulator.ttf", 32)
+
+pygame.mixer.init()
+
+fireSound = pygame.mixer.Sound('assets/laser gun.wav')
+
+# Play the sound (you can specify the number of times to repeat)
 
 
 class Wall(pygame.sprite.Sprite):
@@ -45,7 +52,7 @@ fireLimit = 100
 
 def retryState(countdown):
     # Get the text surface
-    text_surface = font.render("CONTINUE?", True, (255, 255, 255))
+    text_surface = font2.render("CONTINUE?", True, (255, 255, 255))
     text_rect = text_surface.get_rect()
 
     text_rect.center = screen.get_rect().center
@@ -57,14 +64,14 @@ def retryState(countdown):
         pygame.quit()
         sys.exit()
 
-    countdown_surface = font.render(str(countdown), True, (255, 255, 255))
+    countdown_surface = font2.render(str(countdown), True, (255, 255, 255))
     countdown_rect = countdown_surface.get_rect()
     countdown_rect.midtop = (text_rect.centerx, text_rect.bottom + 10)
     screen.blit(countdown_surface, countdown_rect)
 
     # "Retry" prompt
     retry_text = ">INSERT COIN?<"
-    retry_surface = font.render(retry_text, True, (255, 255, 255))
+    retry_surface = font2.render(retry_text, True, (255, 255, 255))
     retry_rect = retry_surface.get_rect()
     retry_rect.midtop = (text_rect.centerx, countdown_rect.bottom + 10)
     screen.blit(retry_surface, retry_rect)
@@ -198,7 +205,7 @@ def loadGame():
     playerTank.walls = tile_list
 
     countdown=10
-    print(len(wall_list))
+    # print(len(wall_list))
     return countdown, gameOver, playerTank, screen, tile_list, all_sprite_list, wall_list, background_list, chunkList, caveTileCount, health, score, camera_x, camera_y, camLowerBound, globalOffset
 
 
@@ -268,14 +275,13 @@ while running == True:
                 m1Click = True
                 all_sprite_list.add(Monster(monsterType="projectile", spawnCoords=(playerTank.rect.x,playerTank.rect.y), walls=tile_list, 
                         allSprites=all_sprite_list, targetCoords=(mouse_x,mouse_y) ,scoreHandle=score, health_Handle=health, playerHandle=playerTank))
+                fireSound.play()
             if event.button == 3:  # Right mouse button (m2) click
                 m2Click = True
                 # health.update_health(health.health-1)
             
-        cursor_img_rect.center = pygame.mouse.get_pos()
-        cursor_surface.blit(cursor_img, (16,32), (0,0,16,64))
-        screen.blit(cursor_img, cursor_img_rect)
-
+        cursor_img_rect.center = (mouse_x,mouse_y)
+    
 
 
     pressed_keys = pygame.key.get_pressed()
@@ -356,7 +362,9 @@ while running == True:
         gameOver = True
 
     # Render game over text, reload game if player clicks to 'insert coin'  
-    if gameOver:        
+    if gameOver: 
+        cursor_surface.blit(cursor_img, (16,32), (0,0,16,64))
+        screen.blit(cursor_img, cursor_img_rect)       
         timer +=1
         retryRect = retryState(countdown)
 
@@ -396,6 +404,9 @@ while running == True:
     # Draw the whole thing
     screen.blit(masked_sprite_image, rotated_rect)
 
+
+    cursor_surface.blit(cursor_img, (16,32), (0,0,16,64))
+    screen.blit(cursor_img, cursor_img_rect)
 
     # ======================= Screen Resize =======================
     # Resize image for zoom in, reset width highet to /1.5, draw screen to real diims
