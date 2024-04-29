@@ -97,7 +97,6 @@ class staticTile(pygame.sprite.Sprite):
         self.rect.y = self.coords[1] + yOffset
         
 
-
         
         
         
