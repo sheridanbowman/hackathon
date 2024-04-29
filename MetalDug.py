@@ -224,6 +224,7 @@ cursor_img_rect = cursor_img.get_rect()
 
 while running == True:
     fireTimer += 1
+    # print(len(all_sprite_list), len(tile_list))
     
     mouse_x, mouse_y = pygame.mouse.get_pos()
     # mouse_x = mouse_x / 1.5
@@ -234,6 +235,9 @@ while running == True:
     background_list.draw(screen)
 
     tile_list.update(globalOffset)
+    for tile in tile_list:
+        if tile.rect.y<-200:
+            tile.kill()
     tile_list.draw(screen)
 
     # DEEBUG: uncomment to see background in front of tiles
@@ -287,6 +291,9 @@ while running == True:
     pressed_keys = pygame.key.get_pressed()
     
     if not gameOver:
+        for mob in all_sprite_list:
+            if mob.rect.y<-200:
+                mob.kill()
         all_sprite_list.update(pressed_keys=pressed_keys, globalOffset=globalOffset)
         playerTank.update(pressed_keys)
 
@@ -309,12 +316,12 @@ while running == True:
     #or kill enemies off screen; or they'll drop to top of current chunk
     #and clip through 
     
-    monsterSpawn = False
-    for chunk in chunkList:
-        for tileInstance in chunk.getTiles():
-            # Camera bounds
-            if (tileInstance.coords[1]-camera_y > 0-TILE_PX_SIZE) and (tileInstance.coords[1]-camera_y < HEIGHT+TILE_PX_SIZE):
-                color = tileInstance.debugColor
+    # monsterSpawn = False
+    # for chunk in chunkList:
+    #     for tileInstance in chunk.getTiles():
+    #         # Camera bounds
+    #         if (tileInstance.coords[1]-camera_y > 0-TILE_PX_SIZE) and (tileInstance.coords[1]-camera_y < HEIGHT+TILE_PX_SIZE):
+    #             color = tileInstance.debugColor
                 # if tileInstance.rect.collidepoint((mouse_x, mouse_y)) and m1Click:
                     # monsterSpawn, points = tileInstance.destroyTile()
                     # score.addScore(points)
